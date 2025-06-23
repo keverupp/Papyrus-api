@@ -5,208 +5,119 @@
     <title>{{title}}</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; } body { font-family:
-      'Arial', sans-serif; font-size: 12px; line-height: 1.4; color: #2c3e50;
-      background: white; position: relative; } /* Marca d'água no centro da
-      página */ .watermark { position: fixed; top: 50%; left: 50%; transform:
-      translate(-50%, -50%) rotate({{watermark.rotation}}deg); font-size:
-      {{watermark.fontSize}}; color: rgba(0, 0, 0,
-      {{watermark.opacity}}); font-weight: bold; text-transform: uppercase;
-      z-index: -1; pointer-events: none; white-space: nowrap; font-family:
-      'Arial Black', Arial, sans-serif; } .container { width: 100%; max-width:
-      800px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; } /*
-      Cabeçalho com logo */ .header { display: flex; justify-content:
-      space-between; align-items: center; margin-bottom: 30px; border-bottom:
-      3px solid #3498db; padding-bottom: 15px; } .header-left { display: flex;
-      align-items: center; gap: 20px; } .logo { max-height:
-      {{logo.height}}; width:
-      {{logo.width}}; object-fit: contain; } .header-text h1 { font-size: 28px;
-      color: #2c3e50; font-weight: bold; margin-bottom: 5px; } .header-text
-      .subtitle { font-size: 14px; color: #7f8c8d; font-style: italic; }
-      .header-right { text-align: right; font-size: 11px; } .header-right
-      .budget-number { font-size: 16px; font-weight: bold; color: #e74c3c;
-      margin-bottom: 5px; } .company-info, .client-info { margin-bottom: 25px; }
-      .info-section { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef
-      100%); padding: 15px; border-radius: 8px; margin-bottom: 15px;
-      border-left: 4px solid #3498db; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-      .info-section h3 { font-size: 14px; color: #2c3e50; margin-bottom: 8px;
-      border-bottom: 1px solid #bdc3c7; padding-bottom: 5px; display: flex;
-      align-items: center; gap: 8px; } .info-section h3::before { content: "🏢";
-      font-size: 16px; } .client-info .info-section h3::before { content: "👤";
-      } .company-details, .client-details { display: grid;
-      grid-template-columns: 1fr 1fr; gap: 15px; font-size: 11px; } .detail-item
-      { display: flex; flex-direction: column; } .detail-label { font-weight:
-      bold; color: #34495e; margin-bottom: 2px; } .detail-value { color:
-      #2c3e50; } .items-table { width: 100%; border-collapse: collapse; margin:
-      25px 0; box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-radius: 8px;
-      overflow: hidden; } .items-table th { background: linear-gradient(135deg,
-      #34495e 0%, #2c3e50 100%); color: white; padding: 15px 12px; text-align:
-      left; font-size: 11px; font-weight: bold; text-transform: uppercase;
-      letter-spacing: 0.5px; } .items-table td { padding: 12px; border-bottom:
-      1px solid #ecf0f1; font-size: 11px; vertical-align: top; } .items-table
-      tr:nth-child(even) { background: #f8f9fa; } .items-table tr:hover {
-      background: #e8f4f8; transition: background-color 0.3s ease; }
-      .item-description { font-weight: bold; color: #2c3e50; margin-bottom: 4px;
-      } .item-details { color: #7f8c8d; font-size: 10px; font-style: italic; }
-      .text-right { text-align: right; } .text-center { text-align: center; }
-      .totals { margin-top: 20px; float: right; width: 350px; } .totals table {
-      width: 100%; border-collapse: collapse; box-shadow: 0 4px 8px
-      rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; } .totals td {
-      padding: 10px 15px; border-bottom: 1px solid #ecf0f1; font-size: 12px; }
-      .totals .subtotal-row { background: #f8f9fa; font-weight: bold; } .totals
-      .total-row { background: linear-gradient(135deg, #e74c3c 0%, #c0392b
-      100%); color: white; font-weight: bold; font-size: 16px; } .notes, .terms
-      { clear: both; margin-top: 30px; padding: 20px; background:
-      linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-left: 4px solid
-      #f39c12; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-      .notes h4, .terms h4 { margin-bottom: 12px; color: #e67e22; font-size:
-      14px; display: flex; align-items: center; gap: 8px; } .notes h4::before {
-      content: "📋"; } .terms h4::before { content: "📜"; } .notes ul, .terms ul
-      { margin-left: 15px; } .notes li, .terms li { margin-bottom: 6px; color:
-      #34495e; } .footer { text-align: center; font-size: 10px; color: #95a5a6;
-      border-top: 2px solid #ecf0f1; padding-top: 20px; margin-top: 50px;
-      background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%); padding:
-      20px; border-radius: 8px; } /* Responsividade para impressão */ @media
-      print { body { font-size: 10px; -webkit-print-color-adjust: exact;
-      color-adjust: exact; } .container { padding: 0; max-width: none; }
-      .watermark { position: absolute; } .company-details, .client-details {
-      grid-template-columns: 1fr; gap: 8px; } } /* Animações sutis */
-      .info-section, .items-table, .totals table, .notes, .terms { animation:
-      fadeIn 0.6s ease-in; } @keyframes fadeIn { from { opacity: 0; transform:
-      translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      'Helvetica Neue', 'Arial', sans-serif; font-size: 9.5px; line-height: 1.3;
+      color: #333; background: #fff; } .container { width: 100%; max-width:
+      800px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
+      .watermark-logo { position: fixed; top: 50%; left: 50%; transform:
+      translate(-50%, -50%); z-index: 0; opacity: 0.05; pointer-events: none;
+      max-width: 45%; max-height: 45%; } .company-header { display: flex;
+      justify-content: space-between; align-items: flex-start; padding-bottom:
+      12px; border-bottom: 1.5px solid #333; margin-bottom: 20px; }
+      .company-logo-and-name { display: flex; align-items: center; gap: 12px; }
+      .company-logo { max-height: 50px; max-width: 160px; object-fit: contain; }
+      .company-name h1 { font-size: 16px; font-weight: bold; color: #000;
+      margin-bottom: 2px; } .company-name .company-details { font-size: 9px;
+      color: #666; } .budget-meta { text-align: right; font-size: 9.5px; }
+      .budget-meta .budget-number { font-size: 13px; font-weight: bold; color:
+      #000; margin-bottom: 4px; } .client-hero { background-color: #f8f9fa;
+      border: 1px solid #e9ecef; padding: 12px; margin-bottom: 20px;
+      border-radius: 3px; } .client-hero h2 { font-size: 11px; font-weight:
+      bold; color: #34495e; margin-bottom: 8px; } .client-details { display:
+      grid; grid-template-columns: 1fr; gap: 6px; } .detail-item .detail-label {
+      font-weight: bold; } .items-table { width: 100%; border-collapse:
+      collapse; margin: 20px 0; } .items-table th { background-color: #34495e;
+      color: white; padding: 6px 8px; text-align: left; font-size: 9px;
+      font-weight: bold; text-transform: uppercase; letter-spacing: 0.4px; }
+      .items-table td { padding: 6px 8px; border-bottom: 1px solid #e9ecef;
+      vertical-align: top; font-size: 9.5px; } .items-table .item-description {
+      font-weight: bold; color: #2c3e50; font-size: 10px; } .items-table
+      .item-details { font-size: 8px; color: #7f8c8d; } .items-table td strong {
+      font-size: 10px; } .totals-section { display: flex; justify-content:
+      flex-end; margin-top: 10px; } .totals-table { width: 45%; max-width:
+      320px; } .totals-table td { padding: 6px 10px; border-bottom: 1px solid
+      #e9ecef; } .totals-table tr.total-row td { background-color: #34495e;
+      color: white; font-weight: bold; font-size: 13px; } .notes-terms-section {
+      padding-top: 20px; border-top: 1.5px solid #e9ecef; margin-top: 20px; }
+      .notes-terms-flex-container { display: flex; justify-content:
+      space-between; align-items: flex-start; gap: 20px; } .content-box { flex:
+      1; min-width: 0; } .content-box h4 { font-size: 11px; font-weight: bold;
+      color: #34495e; margin-bottom: 8px; } .markdown-content { font-size:
+      9.5px; color: #444; line-height: 1.4; } .markdown-content p { margin: 0; }
+      .markdown-content strong { color: #000; } .markdown-content ul,
+      .markdown-content ol { padding-left: 15px; } .footer { text-align: center;
+      font-size: 8.5px; color: #aaa; border-top: 1px solid #f0f0f0; padding-top:
+      12px; margin-top: 25px; } .text-right { text-align: right; } .text-center
+      { text-align: center; } @media print { body { font-size: 9pt;
+      -webkit-print-color-adjust: exact; color-adjust: exact; } .container {
+      padding: 0; max-width: 100%; } .watermark-logo { position: absolute; }
+      .client-hero, .content-box { page-break-inside: avoid; } tr, .detail-item
+      { page-break-inside: avoid; } thead { display: table-header-group; } }
     </style>
   </head>
   <body>
-    <!-- Marca d'água -->
-    <div class="watermark">{{watermark.text}}</div>
+
+    {{#if logo.url}}
+      <img src="{{logo.url}}" class="watermark-logo" alt="Marca d'água" />
+    {{/if}}
 
     <div class="container">
-      <!-- Cabeçalho com Logo -->
-      <div class="header">
-        <div class="header-left">
+
+      <header class="company-header">
+        <div class="company-logo-and-name">
           {{#if logo.url}}
-            <img src="{{logo.url}}" alt="Logo" class="logo" />
+            <img src="{{logo.url}}" alt="Logo" class="company-logo" />
           {{/if}}
-          <div class="header-text">
-            <h1>{{title}}</h1>
-            <div class="subtitle">Proposta Comercial</div>
+          <div class="company-name">
+            <h1>{{budget.company.name}}</h1>
+            <div class="company-details">
+              {{#if budget.company.cnpj}}CNPJ: {{budget.company.cnpj}}{{/if}}
+              {{#if budget.company.address}} | {{budget.company.address}}{{/if}}
+            </div>
           </div>
         </div>
-        <div class="header-right">
-          {{#if budget.number}}
-            <div class="budget-number">{{budget.number}}</div>
-          {{/if}}
+        <div class="budget-meta">
+          <div class="budget-number">Proposta Nº {{budget.number}}</div>
           <div><strong>Data:</strong> {{date "DD/MM/YYYY"}}</div>
           {{#if budget.validUntil}}
-            <div><strong>Válido até:</strong>
+            <div><strong>Válida até:</strong>
               {{date budget.validUntil "DD/MM/YYYY"}}</div>
           {{/if}}
-          {{#if budget.status}}
-            <div><strong>Status:</strong> {{budget.status}}</div>
-          {{/if}}
         </div>
-      </div>
+      </header>
 
-      <!-- Informações da Empresa -->
-      {{#if budget.company}}
-        <div class="company-info">
-          <div class="info-section">
-            <h3>Dados da Empresa</h3>
-            <div class="company-details">
-              <div class="detail-item">
-                <span class="detail-label">Razão Social</span>
-                <span class="detail-value">{{budget.company.name}}</span>
-              </div>
-              {{#if budget.company.cnpj}}
-                <div class="detail-item">
-                  <span class="detail-label">CNPJ</span>
-                  <span class="detail-value">{{budget.company.cnpj}}</span>
-                </div>
-              {{/if}}
-              {{#if budget.company.address}}
-                <div class="detail-item">
-                  <span class="detail-label">Endereço</span>
-                  <span class="detail-value">{{budget.company.address}}</span>
-                </div>
-              {{/if}}
-              {{#if budget.company.phone}}
-                <div class="detail-item">
-                  <span class="detail-label">Telefone</span>
-                  <span class="detail-value">{{budget.company.phone}}</span>
-                </div>
-              {{/if}}
-              {{#if budget.company.email}}
-                <div class="detail-item">
-                  <span class="detail-label">E-mail</span>
-                  <span class="detail-value">{{budget.company.email}}</span>
-                </div>
-              {{/if}}
-              {{#if budget.company.website}}
-                <div class="detail-item">
-                  <span class="detail-label">Website</span>
-                  <span class="detail-value">{{budget.company.website}}</span>
-                </div>
-              {{/if}}
-            </div>
-          </div>
-        </div>
-      {{/if}}
-
-      <!-- Informações do Cliente -->
       {{#if budget.client}}
-        <div class="client-info">
-          <div class="info-section">
-            <h3>Dados do Cliente</h3>
-            <div class="client-details">
-              <div class="detail-item">
-                <span class="detail-label">Nome/Empresa</span>
-                <span class="detail-value">{{budget.client.name}}</span>
-              </div>
-              {{#if budget.client.document}}
-                <div class="detail-item">
-                  <span class="detail-label">{{#ifCond
-                      budget.client.document.length ">" 14
-                    }}CNPJ{{else}}CPF{{/ifCond}}</span>
-                  <span class="detail-value">{{budget.client.document}}</span>
-                </div>
-              {{/if}}
-              {{#if budget.client.address}}
-                <div class="detail-item">
-                  <span class="detail-label">Endereço</span>
-                  <span class="detail-value">{{budget.client.address}}</span>
-                </div>
-              {{/if}}
-              {{#if budget.client.phone}}
-                <div class="detail-item">
-                  <span class="detail-label">Telefone</span>
-                  <span class="detail-value">{{budget.client.phone}}</span>
-                </div>
-              {{/if}}
-              {{#if budget.client.email}}
-                <div class="detail-item">
-                  <span class="detail-label">E-mail</span>
-                  <span class="detail-value">{{budget.client.email}}</span>
-                </div>
-              {{/if}}
-              {{#if budget.client.contact}}
-                <div class="detail-item">
-                  <span class="detail-label">Contato</span>
-                  <span class="detail-value">{{budget.client.contact}}</span>
-                </div>
-              {{/if}}
-            </div>
+        <section class="client-hero">
+          <div class="client-details">
+            <div class="detail-item"><span class="detail-label">Cliente:</span>
+              {{budget.client.name}}</div>
+            {{#if budget.client.document}}
+              <div class="detail-item"><span class="detail-label">{{#ifCond
+                    budget.client.document.length ">" 14
+                  }}CNPJ{{else}}CPF{{/ifCond}}:</span>
+                {{budget.client.document}}</div>
+            {{/if}}
+            {{#if budget.client.email}}
+              <div class="detail-item"><span class="detail-label">E-mail:</span>
+                {{budget.client.email}}</div>
+            {{/if}}
+            {{#if budget.client.phone}}
+              <div class="detail-item"><span
+                  class="detail-label"
+                >Telefone:</span>
+                {{budget.client.phone}}</div>
+            {{/if}}
           </div>
-        </div>
+        </section>
       {{/if}}
 
-      <!-- Tabela de Itens -->
       {{#if budget.items}}
         <table class="items-table">
           <thead>
             <tr>
-              <th style="width: 50%">Descrição dos Serviços</th>
-              <th style="width: 12%" class="text-center">Qtd</th>
-              <th style="width: 18%" class="text-right">Valor Unit.</th>
-              <th style="width: 20%" class="text-right">Total</th>
+              <th style="width: 50%;">Descrição</th>
+              <th style="width: 12%;" class="text-center">Qtd</th>
+              <th style="width: 18%;" class="text-right">Valor Unit.</th>
+              <th style="width: 20%;" class="text-right">Total</th>
             </tr>
           </thead>
           <tbody>
@@ -214,9 +125,9 @@
               <tr>
                 <td>
                   <div class="item-description">{{description}}</div>
-                  {{#if details}}
-                    <div class="item-details">{{details}}</div>
-                  {{/if}}
+                  {{#if details}}<div
+                      class="item-details"
+                    >{{details}}</div>{{/if}}
                 </td>
                 <td class="text-center">{{number quantity 0}}</td>
                 <td class="text-right">{{currency unitPrice}}</td>
@@ -227,75 +138,68 @@
         </table>
       {{/if}}
 
-      <!-- Totais -->
-      <div class="totals">
-        <table>
-          <tr class="subtotal-row">
-            <td><strong>Subtotal:</strong></td>
-            <td class="text-right"><strong>{{currency
+      <section class="totals-section">
+        <table class="totals-table">
+          <tbody>
+            <tr>
+              <td>Subtotal:</td>
+              <td class="text-right">{{currency
                   budget.calculations.subtotal
-                }}</strong></td>
-          </tr>
-          {{#if budget.calculations.discountAmount}}
-            {{#ifCond budget.calculations.discountAmount ">" 0}}
-              <tr>
-                <td>Desconto:</td>
-                <td class="text-right" style="color: #e74c3c;">-{{currency
-                    budget.calculations.discountAmount
-                  }}</td>
-              </tr>
-            {{/ifCond}}
-          {{/if}}
-          {{#if budget.calculations.taxRate}}
-            {{#ifCond budget.calculations.taxRate ">" 0}}
-              <tr>
-                <td>Impostos ({{number budget.calculations.taxRate 1}}%):</td>
-                <td class="text-right">{{currency
-                    budget.calculations.taxAmount
-                  }}</td>
-              </tr>
-            {{/ifCond}}
-          {{/if}}
-          <tr class="total-row">
-            <td><strong>VALOR TOTAL:</strong></td>
-            <td class="text-right"><strong>{{currency
-                  budget.calculations.total
-                }}</strong></td>
-          </tr>
+                }}</td>
+            </tr>
+            {{#if budget.calculations.discountAmount}}
+              {{#ifCond budget.calculations.discountAmount ">" 0}}
+                <tr>
+                  <td>Desconto:</td>
+                  <td class="text-right">-{{currency
+                      budget.calculations.discountAmount
+                    }}</td>
+                </tr>
+              {{/ifCond}}
+            {{/if}}
+            {{#if budget.calculations.taxAmount}}
+              {{#ifCond budget.calculations.taxAmount ">" 0}}
+                <tr>
+                  <td>Impostos:</td>
+                  <td class="text-right">{{currency
+                      budget.calculations.taxAmount
+                    }}</td>
+                </tr>
+              {{/ifCond}}
+            {{/if}}
+            <tr class="total-row">
+              <td><strong>VALOR TOTAL:</strong></td>
+              <td class="text-right"><strong>{{currency
+                    budget.calculations.total
+                  }}</strong></td>
+            </tr>
+          </tbody>
         </table>
-      </div>
+      </section>
 
-      <!-- Observações -->
-      {{#if budget.notes}}
-        <div class="notes">
-          <h4>Observações Importantes</h4>
-          <div>{{{br budget.notes}}}</div>
+      <section class="notes-terms-section">
+        <div class="notes-terms-flex-container">
+          {{#if budget.notes}}
+            <div class="content-box">
+              <h4>Observações</h4>
+              <div class="markdown-content">{{{budget.notes}}}</div>
+            </div>
+          {{/if}}
+          {{#if budget.terms}}
+            <div class="content-box">
+              <h4>Termos e Condições</h4>
+              <div class="markdown-content">{{{budget.terms}}}</div>
+            </div>
+          {{/if}}
         </div>
-      {{/if}}
+      </section>
 
-      <!-- Termos e Condições -->
-      {{#if budget.terms}}
-        <div class="terms">
-          <h4>Termos e Condições</h4>
-          <div>{{{br budget.terms}}}</div>
-        </div>
-      {{/if}}
+      <footer class="footer">
+        {{#if budget.company.website}}<div
+          >{{budget.company.website}}</div>{{/if}}
+        <div>Este orçamento foi gerado em {{date "DD/MM/YYYY HH:mm"}}.</div>
+      </footer>
 
-      <!-- Rodapé -->
-      <div class="footer">
-        <div style="margin-bottom: 10px;">
-          <strong>📧
-            {{budget.company.email}}
-            | 📞
-            {{budget.company.phone}}</strong>
-        </div>
-        <div>
-          Orçamento gerado em
-          {{date "DD/MM/YYYY HH:mm"}}
-          via Papyrus API | Documento com validade legal e marca d'água de
-          segurança
-        </div>
-      </div>
     </div>
   </body>
 </html>
