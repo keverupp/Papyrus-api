@@ -4,8 +4,8 @@
   "description": "API",
   "main": "app.js",
   "scripts": {
-    "start": "NODE_ENV=production node app.js",
-    "dev": "NODE_ENV=development npx nodemon app.js",
+    "start": "cross-env NODE_ENV=production node app.js",
+    "dev": "cross-env NODE_ENV=development npx nodemon app.js",
     "latest": "knex migrate:latest --knexfile=config/knexfile",
     "seed": "knex seed:run --knexfile=config/knexfile"
   },
@@ -31,5 +31,8 @@
     "knex": "^3.1.0",
     "pg": "^8.16.0",
     "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
   }
 }
