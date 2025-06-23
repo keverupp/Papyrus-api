@@ -7,12 +7,20 @@
       * { margin: 0; padding: 0; box-sizing: border-box; } body { font-family:
       'Helvetica Neue', 'Arial', sans-serif; font-size: 9.5px; line-height: 1.3;
       color: #333; background: #fff; } .container { width: 100%; max-width:
-      800px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; }
-      .watermark-logo { position: fixed; top: 50%; left: 50%; transform:
-      translate(-50%, -50%); z-index: 0; opacity: 0.05; pointer-events: none;
-      max-width: 45%; max-height: 45%; } .company-header { display: flex;
-      justify-content: space-between; align-items: flex-start; padding-bottom:
-      12px; border-bottom: 1.5px solid #333; margin-bottom: 20px; }
+      800px; margin: 0 auto; padding: 20px; position: relative; z-index: 1; } /*
+      Marca d'água - logo ou texto */ .watermark-logo { position: fixed; top:
+      50%; left: 50%; transform: translate(-50%, -50%); z-index: 0; opacity:
+      {{watermark.logo.opacity}}; pointer-events: none; max-width:
+      {{watermark.logo.width}}; max-height:
+      {{watermark.logo.height}}; } .watermark-text { position: fixed; top: 50%;
+      left: 50%; transform: translate(-50%, -50%) rotate({{watermark.rotation}}deg);
+      z-index: 0; opacity:
+      {{watermark.opacity}}; pointer-events: none; font-size:
+      {{watermark.fontSize}}; font-weight: bold; color: #000; text-transform:
+      uppercase; white-space: nowrap; font-family: 'Arial Black', Arial,
+      sans-serif; } .company-header { display: flex; justify-content:
+      space-between; align-items: flex-start; padding-bottom: 12px;
+      border-bottom: 1.5px solid #333; margin-bottom: 20px; }
       .company-logo-and-name { display: flex; align-items: center; gap: 12px; }
       .company-logo { max-height: 50px; max-width: 160px; object-fit: contain; }
       .company-name h1 { font-size: 16px; font-weight: bold; color: #000;
@@ -49,19 +57,27 @@
       12px; margin-top: 25px; } .text-right { text-align: right; } .text-center
       { text-align: center; } @media print { body { font-size: 9pt;
       -webkit-print-color-adjust: exact; color-adjust: exact; } .container {
-      padding: 0; max-width: 100%; } .watermark-logo { position: absolute; }
-      .client-hero, .content-box { page-break-inside: avoid; } tr, .detail-item
-      { page-break-inside: avoid; } thead { display: table-header-group; } }
+      padding: 0; max-width: 100%; } .watermark-logo, .watermark-text {
+      position: absolute; } .client-hero, .content-box { page-break-inside:
+      avoid; } tr, .detail-item { page-break-inside: avoid; } thead { display:
+      table-header-group; } }
     </style>
   </head>
   <body>
-
-    {{#if logo.url}}
-      <img src="{{logo.url}}" class="watermark-logo" alt="Marca d'água" />
+    <!-- Marca d'água - Logo ou Texto -->
+    {{#if watermark}}
+      {{#ifCond watermark.type "===" "logo"}}
+        <img
+          src="{{watermark.logo.url}}"
+          class="watermark-logo"
+          alt="Marca d'água"
+        />
+      {{else}}
+        <div class="watermark-text">{{watermark.text}}</div>
+      {{/ifCond}}
     {{/if}}
 
     <div class="container">
-
       <header class="company-header">
         <div class="company-logo-and-name">
           {{#if logo.url}}
@@ -76,7 +92,8 @@
           </div>
         </div>
         <div class="budget-meta">
-          <div class="budget-number">Proposta Nº {{budget.number}}</div>
+          <div class="budget-number">{{#if budget.number}}Proposta Nº
+              {{budget.number}}{{else}}{{title}}{{/if}}</div>
           <div><strong>Data:</strong> {{date "DD/MM/YYYY"}}</div>
           {{#if budget.validUntil}}
             <div><strong>Válida até:</strong>
@@ -88,23 +105,29 @@
       {{#if budget.client}}
         <section class="client-hero">
           <div class="client-details">
-            <div class="detail-item"><span class="detail-label">Cliente:</span>
-              {{budget.client.name}}</div>
+            <div class="detail-item">
+              <span class="detail-label">Cliente:</span>
+              {{budget.client.name}}
+            </div>
             {{#if budget.client.document}}
-              <div class="detail-item"><span class="detail-label">{{#ifCond
+              <div class="detail-item">
+                <span class="detail-label">{{#ifCond
                     budget.client.document.length ">" 14
                   }}CNPJ{{else}}CPF{{/ifCond}}:</span>
-                {{budget.client.document}}</div>
+                {{budget.client.document}}
+              </div>
             {{/if}}
             {{#if budget.client.email}}
-              <div class="detail-item"><span class="detail-label">E-mail:</span>
-                {{budget.client.email}}</div>
+              <div class="detail-item">
+                <span class="detail-label">E-mail:</span>
+                {{budget.client.email}}
+              </div>
             {{/if}}
             {{#if budget.client.phone}}
-              <div class="detail-item"><span
-                  class="detail-label"
-                >Telefone:</span>
-                {{budget.client.phone}}</div>
+              <div class="detail-item">
+                <span class="detail-label">Telefone:</span>
+                {{budget.client.phone}}
+              </div>
             {{/if}}
           </div>
         </section>
@@ -160,7 +183,7 @@
             {{#if budget.calculations.taxAmount}}
               {{#ifCond budget.calculations.taxAmount ">" 0}}
                 <tr>
-                  <td>Impostos:</td>
+                  <td>Impostos ({{number budget.calculations.taxRate 1}}%):</td>
                   <td class="text-right">{{currency
                       budget.calculations.taxAmount
                     }}</td>
@@ -199,7 +222,6 @@
           >{{budget.company.website}}</div>{{/if}}
         <div>Este orçamento foi gerado em {{date "DD/MM/YYYY HH:mm"}}.</div>
       </footer>
-
     </div>
   </body>
 </html>

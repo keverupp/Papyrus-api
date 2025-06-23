@@ -163,12 +163,6 @@ module.exports = fp(
      */
     async function renderTemplate(templateType, data) {
       try {
-        // Debug: verificar se handlebars está disponível
-        app.log.info("🔍 Verificando handlebars...", {
-          handlebars_available: !!app.handlebars,
-          renderTemplate_available: !!app.handlebars?.renderTemplate,
-        });
-
         if (!app.handlebars) {
           throw new Error("Plugin handlebars não foi carregado");
         }
@@ -189,11 +183,6 @@ module.exports = fp(
 
         // Processa os dados específicos do template
         const processedData = processTemplateData(templateType, data);
-
-        app.log.info("🎨 Renderizando template", {
-          template_type: templateType,
-          template_file: templateInfo.template,
-        });
 
         // Renderiza o template
         return await app.handlebars.renderTemplate(
@@ -329,23 +318,85 @@ module.exports = fp(
     }
 
     function processBudgetPremiumTemplate(data) {
-      // Processa igual ao budget normal, mas adiciona logo e marca d'água
-      const budgetData = processBudgetTemplate(data);
+      const budget = data.budget || {};
+      const items = budget.items || [];
 
-      return {
-        ...budgetData,
-        logo: {
-          url: data.logo?.url || "",
-          width: data.logo?.width || "120px",
-          height: data.logo?.height || "60px",
-        },
-        watermark: {
-          text: data.watermark?.text || "ORÇAMENTO",
-          opacity: data.watermark?.opacity || 0.08,
-          rotation: data.watermark?.rotation || -45,
-          fontSize: data.watermark?.fontSize || "80px",
+      // Calcula totais corretamente
+      const processedItems = items.map((item) => {
+        const quantity = parseFloat(item.quantity) || 0;
+        const unitPrice = parseFloat(item.unitPrice) || 0;
+        const total = quantity * unitPrice;
+
+        return {
+          ...item,
+          quantity,
+          unitPrice,
+          total,
+        };
+      });
+
+      const subtotal = processedItems.reduce(
+        (sum, item) => sum + item.total,
+        0
+      );
+      const discountAmount = parseFloat(budget.discount) || 0;
+      const taxRate = parseFloat(budget.taxRate) || 0;
+
+      const baseForTax = subtotal - discountAmount;
+      const taxAmount = baseForTax * (taxRate / 100);
+      const total = baseForTax + taxAmount;
+
+      const processedData = {
+        title: data.title || "Orçamento Premium",
+        date: new Date(),
+        budget: {
+          ...budget,
+          items: processedItems,
+          calculations: {
+            subtotal,
+            discountAmount,
+            taxRate,
+            taxAmount,
+            total,
+          },
         },
       };
+
+      // Configuração do logo (cabeçalho e marca d'água)
+      if (data.logo?.url) {
+        processedData.logo = {
+          url: data.logo.url,
+          width: data.logo.width || "120px",
+          height: data.logo.height || "60px",
+        };
+      }
+
+      // Configuração da marca d'água (logo OU texto)
+      if (data.watermark) {
+        if (data.watermark.type === "logo" && data.watermark.logo?.url) {
+          // Marca d'água tipo logo
+          processedData.watermark = {
+            type: "logo",
+            logo: {
+              url: data.watermark.logo.url,
+              opacity: data.watermark.opacity || 0.05,
+              width: data.watermark.logo.width || "300px",
+              height: data.watermark.logo.height || "auto",
+            },
+          };
+        } else {
+          // Marca d'água tipo texto (padrão)
+          processedData.watermark = {
+            type: "text",
+            text: data.watermark.text || "CONFIDENCIAL",
+            opacity: data.watermark.opacity || 0.08,
+            rotation: data.watermark.rotation || -45,
+            fontSize: data.watermark.fontSize || "80px",
+          };
+        }
+      }
+
+      return processedData;
     }
 
     function processAnamnesisTemplate(data) {
