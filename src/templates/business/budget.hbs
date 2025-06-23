@@ -1,0 +1,207 @@
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{title}}</title>
+    <style>
+      /* --- GERAL & RESET --- */ * { margin: 0; padding: 0; box-sizing:
+      border-box; } body { font-family: 'Arial', sans-serif; font-size: 10px; /*
+      Reduzido de 12px */ line-height: 1.3; /* Reduzido de 1.4 */ color:
+      #2c3e50; background: white; } .container { width: 100%; max-width: 800px;
+      margin: 0 auto; padding: 15px; /* Reduzido de 20px */ } /* --- CABEÇALHO
+      --- */ .header { display: flex; justify-content: space-between;
+      align-items: flex-start; margin-bottom: 20px; /* Reduzido de 30px */
+      border-bottom: 2px solid #3498db; padding-bottom: 10px; /* Reduzido de
+      15px */ } .header h1 { font-size: 24px; /* Reduzido de 28px */ color:
+      #2c3e50; font-weight: bold; } .header .budget-info { text-align: right;
+      font-size: 10px; /* Reduzido de 11px */ } /* --- INFORMAÇÕES (Empresa &
+      Cliente em Grade) --- */ .info-grid { display: flex; justify-content:
+      space-between; gap: 15px; /* Espaço entre as colunas */ margin-bottom:
+      20px; /* Reduzido de 25px */ } .info-column { flex: 1; /* Faz as colunas
+      ocuparem espaço igual */ min-width: 0; } .info-section { background:
+      #f8f9fa; padding: 10px; /* Reduzido de 15px */ border-radius: 4px; /*
+      Reduzido de 5px */ height: 100%; /* Para alinhar caixas de mesma altura */
+      } .info-section h3 { font-size: 12px; /* Reduzido de 14px */ color:
+      #34495e; margin-bottom: 6px; /* Reduzido de 8px */ border-bottom: 1px
+      solid #bdc3c7; padding-bottom: 4px; /* Reduzido de 5px */ } /* --- TABELA
+      DE ITENS (Principal Otimização) --- */ .items-table { width: 100%;
+      border-collapse: collapse; margin: 20px 0; /* Reduzido de 25px */ }
+      .items-table th { background: #34495e; color: white; padding: 6px 8px; /*
+      Reduzido de 12px 8px */ text-align: left; font-size: 10px; /* Reduzido de
+      11px */ font-weight: bold; } .items-table td { padding: 5px 8px; /*
+      Reduzido drasticamente de 10px 8px */ border-bottom: 1px solid #ecf0f1;
+      font-size: 10px; /* Reduzido de 11px */ vertical-align: top; }
+      .items-table tr:nth-child(even) { background: #f8f9fa; } .items-table
+      tr:hover { background: #e8f4f8; } .items-table small { font-size: 9px; }
+      /* --- TOTAIS --- */ .totals { margin-top: 10px; /* Reduzido de 20px */
+      float: right; width: 280px; /* Reduzido de 300px */ } .totals table {
+      width: 100%; } .totals td { padding: 5px 10px; /* Reduzido de 8px 12px */
+      border-bottom: 1px solid #ecf0f1; font-size: 11px; /* Reduzido de 12px */
+      } .totals .total-row { background: #34495e; color: white; font-weight:
+      bold; font-size: 13px; /* Reduzido de 14px */ } .totals .total-row td {
+      padding: 8px 10px; } /* --- OBSERVAÇÕES & TERMOS --- */ .notes-container {
+      clear: both; padding-top: 20px; /* Espaço após a flutuação dos totais */ }
+      .notes { margin-top: 15px; /* Reduzido de 40px */ padding: 10px; /*
+      Reduzido de 15px */ background: #f8f9fa; border-left: 3px solid #3498db;
+      /* Reduzido de 4px */ } .notes h4 { margin-bottom: 5px; /* Reduzido de
+      10px */ color: #34495e; font-size: 11px; } /* --- RODAPÉ --- */ .footer {
+      clear: both; text-align: center; font-size: 9px; /* Reduzido de 10px */
+      color: #95a5a6; border-top: 1px solid #ecf0f1; padding-top: 10px; /*
+      Reduzido de 15px */ margin-top: 25px; /* Reduzido de 40px */ } /* ---
+      CLASSES UTILITÁRIAS --- */ .text-right { text-align: right; } .text-center
+      { text-align: center; } /* --- CONTROLE DE IMPRESSÃO / PDF --- */ @media
+      print { body { font-size: 9pt; /* Usar 'pt' para impressão é mais
+      consistente */ -webkit-print-color-adjust: exact; /* Força a impressão de
+      cores de fundo no Chrome/Safari */ color-adjust: exact; /* Padrão */ }
+      .container { padding: 0; } .no-print { display: none; } /* Classe para
+      esconder elementos na impressão */ /* Evita quebras de página em locais
+      indesejados */ .header, .info-grid, .totals, .notes, .footer {
+      page-break-inside: avoid; } tr { page-break-inside: avoid;
+      page-break-after: auto; } /* Repete o cabeçalho da tabela em cada nova
+      página */ thead { display: table-header-group; } }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>{{title}}</h1>
+        <div class="budget-info">
+          <div><strong>Número:</strong> {{budget.number}}</div>
+          <div><strong>Data:</strong> {{date "DD/MM/YYYY"}}</div>
+          {{#if budget.validUntil}}
+            <div><strong>Válido até:</strong>
+              {{date budget.validUntil "DD/MM/YYYY"}}</div>
+          {{/if}}
+        </div>
+      </div>
+
+      <div class="info-grid">
+        {{#if budget.company}}
+          <div class="info-column">
+            <div class="info-section">
+              <h3>Empresa</h3>
+              <div><strong>{{budget.company.name}}</strong></div>
+              {{#if budget.company.address}}<div
+                >{{budget.company.address}}</div>{{/if}}
+              {{#if budget.company.phone}}<div>Tel:
+                  {{budget.company.phone}}</div>{{/if}}
+              {{#if budget.company.email}}<div>E-mail:
+                  {{budget.company.email}}</div>{{/if}}
+              {{#if budget.company.cnpj}}<div>CNPJ:
+                  {{budget.company.cnpj}}</div>{{/if}}
+            </div>
+          </div>
+        {{/if}}
+
+        {{#if budget.client}}
+          <div class="info-column">
+            <div class="info-section">
+              <h3>Cliente</h3>
+              <div><strong>{{budget.client.name}}</strong></div>
+              {{#if budget.client.address}}<div
+                >{{budget.client.address}}</div>{{/if}}
+              {{#if budget.client.phone}}<div>Tel:
+                  {{budget.client.phone}}</div>{{/if}}
+              {{#if budget.client.email}}<div>E-mail:
+                  {{budget.client.email}}</div>{{/if}}
+              {{#if budget.client.document}}
+                <div>{{#ifCond
+                    budget.client.document.length ">" 14
+                  }}CNPJ{{else}}CPF{{/ifCond}}:
+                  {{budget.client.document}}</div>
+              {{/if}}
+            </div>
+          </div>
+        {{/if}}
+      </div>
+
+      {{#if budget.items}}
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th style="width: 50%;">Descrição</th>
+              <th style="width: 12%;" class="text-center">Qtd</th>
+              <th style="width: 18%;" class="text-right">Valor Unit.</th>
+              <th style="width: 20%;" class="text-right">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each budget.items}}
+              <tr>
+                <td>
+                  <strong>{{description}}</strong>
+                  {{#if details}}
+                    <br /><small style="color: #7f8c8d;">{{details}}</small>
+                  {{/if}}
+                </td>
+                <td class="text-center">{{number quantity}}</td>
+                <td class="text-right">{{currency unitPrice}}</td>
+                <td class="text-right"><strong>{{currency total}}</strong></td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      {{/if}}
+
+      <div class="bottom-section">
+        <div class="totals">
+          <table>
+            <tr>
+              <td><strong>Subtotal:</strong></td>
+              <td class="text-right">{{currency
+                  budget.calculations.subtotal
+                }}</td>
+            </tr>
+            {{#if budget.calculations.discountAmount}}
+              {{#ifCond budget.calculations.discountAmount ">" 0}}
+                <tr>
+                  <td>Desconto:</td>
+                  <td class="text-right">-{{currency
+                      budget.calculations.discountAmount
+                    }}</td>
+                </tr>
+              {{/ifCond}}
+            {{/if}}
+            {{#if budget.calculations.taxRate}}
+              {{#ifCond budget.calculations.taxRate ">" 0}}
+                <tr>
+                  <td>Impostos ({{number budget.calculations.taxRate 1}}%):</td>
+                  <td class="text-right">{{currency
+                      budget.calculations.taxAmount
+                    }}</td>
+                </tr>
+              {{/ifCond}}
+            {{/if}}
+            <tr class="total-row">
+              <td><strong>TOTAL:</strong></td>
+              <td class="text-right"><strong>{{currency
+                    budget.calculations.total
+                  }}</strong></td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="notes-container">
+          {{#if budget.notes}}
+            <div class="notes">
+              <h4>Observações</h4>
+              <div>{{{br budget.notes}}}</div>
+            </div>
+          {{/if}}
+          {{#if budget.terms}}
+            <div class="notes">
+              <h4>Termos e Condições</h4>
+              <div>{{{br budget.terms}}}</div>
+            </div>
+          {{/if}}
+        </div>
+      </div>
+
+      <div class="footer">
+        Orçamento gerado em
+        {{date "DD/MM/YYYY HH:mm"}}
+        via Papyrus API
+      </div>
+    </div>
+  </body>
+</html>

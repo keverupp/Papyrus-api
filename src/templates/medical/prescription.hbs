@@ -1,0 +1,214 @@
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{title}}</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; } body { font-family:
+      'Arial', sans-serif; font-size: 12px; line-height: 1.4; color: #000;
+      background: white; } .container { width: 100%; max-width: 600px; margin: 0
+      auto; padding: 20px; border: 2px solid #2c3e50; min-height: 700px; }
+      .header { text-align: center; margin-bottom: 25px; border-bottom: 1px
+      solid #34495e; padding-bottom: 15px; } .header h1 { font-size: 24px;
+      color: #2c3e50; margin-bottom: 5px; font-weight: bold; } .header .subtitle
+      { font-size: 14px; color: #7f8c8d; font-style: italic; } .doctor-info {
+      background: #ecf0f1; padding: 15px; margin-bottom: 20px; border-radius:
+      5px; } .doctor-info h3 { color: #2c3e50; font-size: 14px; margin-bottom:
+      8px; border-bottom: 1px solid #bdc3c7; padding-bottom: 3px; }
+      .doctor-details { display: flex; flex-wrap: wrap; gap: 15px; font-size:
+      11px; } .doctor-details div { flex: 1; min-width: 150px; } .patient-info {
+      margin-bottom: 25px; padding: 12px; border: 1px solid #bdc3c7; background:
+      #f8f9fa; } .patient-info h3 { color: #34495e; font-size: 13px;
+      margin-bottom: 8px; } .patient-fields { display: flex; gap: 15px;
+      font-size: 11px; } .patient-fields div { flex: 1; } .patient-fields label
+      { font-weight: bold; color: #2c3e50; } .prescription-content { margin:
+      25px 0; min-height: 300px; } .prescription-header { text-align: center;
+      font-size: 16px; font-weight: bold; color: #2c3e50; margin-bottom: 20px;
+      text-decoration: underline; } .medication { margin-bottom: 20px; padding:
+      12px; border-left: 3px solid #3498db; background: #f8f9fa; }
+      .medication-name { font-size: 14px; font-weight: bold; color: #2c3e50;
+      margin-bottom: 5px; } .medication-details { font-size: 11px; color:
+      #34495e; margin-bottom: 8px; } .medication-instructions { font-size: 12px;
+      color: #000; font-style: italic; background: white; padding: 8px;
+      border-radius: 3px; } .custom-instructions { margin-top: 20px; padding:
+      15px; border: 1px dashed #7f8c8d; background: #fefefe; }
+      .custom-instructions h4 { color: #2c3e50; font-size: 13px; margin-bottom:
+      8px; } .signature-section { margin-top: 40px; display: flex;
+      justify-content: space-between; align-items: end; } .signature-box {
+      text-align: center; min-width: 200px; } .signature-line { border-bottom:
+      1px solid #000; margin-bottom: 5px; height: 40px; } .signature-label {
+      font-size: 10px; color: #7f8c8d; } .footer-info { margin-top: 30px;
+      padding-top: 15px; border-top: 1px solid #ecf0f1; font-size: 9px; color:
+      #95a5a6; text-align: center; } .warning-box { background: #fff3cd; border:
+      1px solid #ffeaa7; padding: 10px; margin: 15px 0; border-radius: 3px;
+      font-size: 10px; color: #856404; } .crm-info { position: absolute; top:
+      20px; right: 20px; font-size: 10px; color: #7f8c8d; text-align: right; }
+      @media print { body { font-size: 11px; } .container { padding: 15px;
+      border-width: 1px; } }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- CRM Info (canto superior direito) -->
+      {{#if doctor.crm}}
+        <div class="crm-info">
+          CRM:
+          {{doctor.crm}}<br />
+          {{#if doctor.specialty}}{{doctor.specialty}}{{/if}}
+        </div>
+      {{/if}}
+
+      <!-- Cabeçalho -->
+      <div class="header">
+        <h1>RECEITA MÉDICA</h1>
+        <div class="subtitle">Prescrição Médica</div>
+      </div>
+
+      <!-- Informações do Médico -->
+      {{#if doctor}}
+        <div class="doctor-info">
+          <h3>Médico Prescritor</h3>
+          <div class="doctor-details">
+            <div><strong>Nome:</strong> {{doctor.name}}</div>
+            {{#if doctor.specialty}}
+              <div><strong>Especialidade:</strong> {{doctor.specialty}}</div>
+            {{/if}}
+            {{#if doctor.clinic}}
+              <div><strong>Clínica:</strong> {{doctor.clinic}}</div>
+            {{/if}}
+            {{#if doctor.phone}}
+              <div><strong>Telefone:</strong> {{doctor.phone}}</div>
+            {{/if}}
+            {{#if doctor.address}}
+              <div style="flex-basis: 100%;"><strong>Endereço:</strong>
+                {{doctor.address}}</div>
+            {{/if}}
+          </div>
+        </div>
+      {{/if}}
+
+      <!-- Informações do Paciente -->
+      {{#if patient}}
+        <div class="patient-info">
+          <h3>Dados do Paciente</h3>
+          <div class="patient-fields">
+            <div>
+              <label>Nome:</label>
+              {{patient.name}}
+            </div>
+            {{#if patient.age}}
+              <div>
+                <label>Idade:</label>
+                {{patient.age}}
+                anos
+              </div>
+            {{/if}}
+            {{#if patient.weight}}
+              <div>
+                <label>Peso:</label>
+                {{patient.weight}}
+                kg
+              </div>
+            {{/if}}
+          </div>
+          {{#if patient.allergies}}
+            <div style="margin-top: 8px; color: #e74c3c;">
+              <strong>Alergias:</strong>
+              {{patient.allergies}}
+            </div>
+          {{/if}}
+        </div>
+      {{/if}}
+
+      <!-- Conteúdo da Prescrição -->
+      <div class="prescription-content">
+        <div class="prescription-header">PRESCRIÇÃO</div>
+
+        {{#if medications}}
+          {{#each medications}}
+            <div class="medication">
+              <div class="medication-name">
+                {{#if genericName}}{{genericName}}{{else}}{{name}}{{/if}}
+                {{#if concentration}} - {{concentration}}{{/if}}
+              </div>
+
+              {{#if commercialName}}
+                <div class="medication-details">
+                  <strong>Nome comercial:</strong>
+                  {{commercialName}}
+                </div>
+              {{/if}}
+
+              {{#if presentation}}
+                <div class="medication-details">
+                  <strong>Apresentação:</strong>
+                  {{presentation}}
+                </div>
+              {{/if}}
+
+              <div class="medication-instructions">
+                {{#if dosage}}<strong>Dosagem:</strong> {{dosage}}<br />{{/if}}
+                {{#if frequency}}<strong>Frequência:</strong>
+                  {{frequency}}<br />{{/if}}
+                {{#if duration}}<strong>Duração:</strong>
+                  {{duration}}<br />{{/if}}
+                {{#if instructions}}<strong>Instruções:</strong>
+                  {{instructions}}{{/if}}
+              </div>
+            </div>
+          {{/each}}
+        {{/if}}
+
+        {{#if customInstructions}}
+          <div class="custom-instructions">
+            <h4>Instruções Adicionais</h4>
+            <div>{{{br customInstructions}}}</div>
+          </div>
+        {{/if}}
+      </div>
+
+      <!-- Avisos Importantes -->
+      {{#if warnings}}
+        <div class="warning-box">
+          <strong>⚠️ IMPORTANTE:</strong>
+          {{warnings}}
+        </div>
+      {{else}}
+        <div class="warning-box">
+          <strong>⚠️ IMPORTANTE:</strong>
+          Siga rigorosamente as orientações médicas. Não interrompa o tratamento
+          sem orientação. Em caso de reações adversas, procure atendimento
+          médico imediatamente.
+        </div>
+      {{/if}}
+
+      <!-- Assinatura -->
+      <div class="signature-section">
+        <div style="font-size: 11px;">
+          <strong>Data:</strong>
+          {{date "DD/MM/YYYY"}}<br />
+          <strong>Local:</strong>
+          ____________________
+        </div>
+        <div class="signature-box">
+          <div class="signature-line"></div>
+          <div class="signature-label">
+            {{#if
+              doctor.name
+            }}{{doctor.name}}{{else}}_______________________{{/if}}<br />
+            {{#if doctor.crm}}CRM: {{doctor.crm}}{{else}}CRM: _______________{{/if}}
+          </div>
+        </div>
+      </div>
+
+      <!-- Rodapé -->
+      <div class="footer-info">
+        Receita gerada em
+        {{date "DD/MM/YYYY HH:mm"}}
+        via Papyrus API<br />
+        Esta receita é válida em todo território nacional por 30 dias a partir
+        da data de emissão
+      </div>
+    </div>
+  </body>
+</html>
