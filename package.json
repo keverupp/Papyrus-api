@@ -1,5 +1,5 @@
 {
-  "name": "fastify-api",
+  "name": "papyrus-api",
   "version": "1.0.0",
   "description": "API",
   "main": "app.js",
@@ -10,7 +10,7 @@
     "seed": "knex seed:run --knexfile=config/knexfile"
   },
   "keywords": [],
-  "author": "Yuri Fontella",
+  "author": "Keverupp",
   "license": "ISC",
   "dependencies": {
     "@fastify/auth": "^5.0.2",
