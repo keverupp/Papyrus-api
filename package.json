@@ -9,7 +9,11 @@
     "migrate:latest": "knex migrate:latest --knexfile=config/knexfile/index.js",
     "migrate:rollback": "knex migrate:rollback --knexfile=config/knexfile/index.js",
     "migrate:make": "knex migrate:make --knexfile=config/knexfile/index.js",
-    "seed:run": "knex seed:run --knexfile=config/knexfile/index.js"
+    "seed:run": "knex seed:run --knexfile=config/knexfile/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "echo \"No linting configured yet\"",
+    "clean-cache": "rm -rf node_modules/.cache",
+    "health-check": "curl -f http://localhost:4000/health || exit 1"
   },
   "keywords": [
     "pdf",
