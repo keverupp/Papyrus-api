@@ -1,5 +1,7 @@
 # 📜 Papyrus API
 
+[🇧🇷 Versão em Português](README.md) | [🇺🇸 English Version](README.en.md)
+
 API open-source para **geração de PDFs com templates personalizáveis**, construída com **Fastify** e **Puppeteer**. Ideal para aplicações educacionais, empresariais, médicas e documentos diversos.
 
 ---
