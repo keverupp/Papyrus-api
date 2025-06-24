@@ -6,37 +6,208 @@ const path = require("path");
 
 module.exports = fp(
   async (app) => {
+    // Cache dos templates para evitar re-scan constante
+    let templatesCache = null;
+    let lastScanTime = 0;
+    const CACHE_DURATION = 30000; // 30 segundos
+
     app.decorate("templateService", {
       getAvailableTemplates: getAvailableTemplates,
       validateTemplateType: validateTemplateType,
       getTemplateData: getTemplateData,
       processTemplateData: processTemplateData,
       renderTemplate: renderTemplate,
+      refreshTemplatesCache: refreshTemplatesCache,
+      scanTemplateFolder: scanTemplateFolder,
     });
 
     /**
      * Lista todos os templates disponíveis organizados por categoria
+     * Agora com detecção automática das pastas
      */
     async function getAvailableTemplates() {
-      const templates = {
+      const now = Date.now();
+
+      // Usa cache se ainda está válido
+      if (templatesCache && now - lastScanTime < CACHE_DURATION) {
+        return templatesCache;
+      }
+
+      app.log.info("🔍 Escaneando templates automaticamente...");
+
+      try {
+        const templatesDir = path.resolve("src/templates");
+        const templates = {};
+
+        // Lê todas as pastas em src/templates
+        const categories = await fs.readdir(templatesDir, {
+          withFileTypes: true,
+        });
+
+        for (const category of categories) {
+          if (category.isDirectory()) {
+            const categoryName = category.name;
+            const categoryPath = path.join(templatesDir, categoryName);
+
+            app.log.info(`📂 Escaneando categoria: ${categoryName}`);
+
+            // Escaneia arquivos .hbs na categoria
+            const templateFiles = await fs.readdir(categoryPath);
+            const categoryTemplates = [];
+
+            for (const file of templateFiles) {
+              if (file.endsWith(".hbs")) {
+                const templatePath = path.join(categoryPath, file);
+                const templateInfo = await parseTemplateMetadata(
+                  templatePath,
+                  categoryName,
+                  file
+                );
+
+                if (templateInfo) {
+                  categoryTemplates.push(templateInfo);
+                  app.log.info(
+                    `✅ Template encontrado: ${templateInfo.type} (${templateInfo.name})`
+                  );
+                }
+              }
+            }
+
+            if (categoryTemplates.length > 0) {
+              templates[categoryName] = categoryTemplates;
+            }
+          }
+        }
+
+        // Atualiza cache
+        templatesCache = templates;
+        lastScanTime = now;
+
+        app.log.info(
+          `🎉 Scan concluído! ${Object.keys(templates).length} categorias, ${
+            Object.values(templates).flat().length
+          } templates`
+        );
+
+        return templates;
+      } catch (error) {
+        app.log.error("❌ Erro ao escanear templates:", error);
+
+        // Fallback para templates hardcoded se o scan falhar
+        return getFallbackTemplates();
+      }
+    }
+
+    /**
+     * Extrai metadados do template a partir de comentários especiais
+     */
+    async function parseTemplateMetadata(templatePath, categoryName, fileName) {
+      try {
+        const content = await fs.readFile(templatePath, "utf8");
+
+        // Procura pelo bloco de metadados no início do arquivo
+        const metadataRegex = /<!--\s*TEMPLATE_META\s*([\s\S]*?)\s*-->/;
+        const match = content.match(metadataRegex);
+
+        if (match) {
+          // Parseia os metadados do comentário
+          const metadataText = match[1];
+          const metadata = parseMetadataText(metadataText);
+
+          return {
+            type: metadata.type || path.basename(fileName, ".hbs"),
+            name: metadata.name || metadata.type || fileName,
+            description:
+              metadata.description || `Template ${metadata.type || fileName}`,
+            template: `${categoryName}/${fileName}`,
+            category: categoryName,
+            tags: metadata.tags || [],
+            version: metadata.version || "1.0.0",
+            author: metadata.author,
+            lastModified: (await fs.stat(templatePath)).mtime,
+          };
+        } else {
+          // Fallback: gera metadados básicos baseado no nome do arquivo
+          const type = path.basename(fileName, ".hbs");
+
+          return {
+            type: type,
+            name: generateDisplayName(type),
+            description: `Template ${type} (sem metadados)`,
+            template: `${categoryName}/${fileName}`,
+            category: categoryName,
+            tags: [categoryName],
+            version: "1.0.0",
+            lastModified: (await fs.stat(templatePath)).mtime,
+          };
+        }
+      } catch (error) {
+        app.log.warn(`⚠️ Erro ao ler template ${templatePath}:`, error.message);
+        return null;
+      }
+    }
+
+    /**
+     * Parseia o texto dos metadados
+     */
+    function parseMetadataText(text) {
+      const metadata = {};
+      const lines = text
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line);
+
+      for (const line of lines) {
+        const [key, ...valueParts] = line.split(":");
+        if (key && valueParts.length > 0) {
+          const value = valueParts.join(":").trim();
+          const cleanKey = key.toLowerCase().replace(/[^a-z]/g, "");
+
+          if (cleanKey === "tags") {
+            metadata[cleanKey] = value.split(",").map((tag) => tag.trim());
+          } else {
+            metadata[cleanKey] = value;
+          }
+        }
+      }
+
+      return metadata;
+    }
+
+    /**
+     * Gera nome de exibição baseado no tipo
+     */
+    function generateDisplayName(type) {
+      const names = {
+        blank: "Página em Branco",
+        logo: "Com Logotipo",
+        watermark: "Com Marca d'água",
+        exam: "Prova/Exame",
+        assessment: "Avaliação",
+        quiz: "Quiz/Questionário",
+        budget: "Orçamento",
+        "budget-premium": "Orçamento Premium",
+        report: "Relatório",
+        invoice: "Fatura/Invoice",
+        anamnesis: "Ficha de Anamnese",
+        prescription: "Receita Médica",
+        clinical_form: "Formulário Clínico",
+      };
+
+      return names[type] || type.charAt(0).toUpperCase() + type.slice(1);
+    }
+
+    /**
+     * Templates de fallback caso o scan automático falhe
+     */
+    function getFallbackTemplates() {
+      return {
         basic: [
           {
             type: "blank",
             name: "Página em Branco",
             description: "Documento básico sem formatação específica",
             template: "basic/blank.hbs",
-          },
-          {
-            type: "logo",
-            name: "Com Logotipo",
-            description: "Documento com espaço para logotipo no cabeçalho",
-            template: "basic/logo.hbs",
-          },
-          {
-            type: "watermark",
-            name: "Com Marca d'água",
-            description: "Documento com marca d'água personalizada",
-            template: "basic/watermark.hbs",
           },
         ],
         educational: [
@@ -46,38 +217,8 @@ module.exports = fp(
             description: "Template para provas e exames escolares",
             template: "educational/exam.hbs",
           },
-          {
-            type: "assessment",
-            name: "Avaliação",
-            description: "Template para avaliações e questionários",
-            template: "educational/assessment.hbs",
-          },
-          {
-            type: "quiz",
-            name: "Quiz/Questionário",
-            description: "Template para questionários simples",
-            template: "educational/quiz.hbs",
-          },
         ],
         business: [
-          {
-            type: "budget",
-            name: "Orçamento",
-            description: "Template para orçamentos empresariais",
-            template: "business/budget.hbs",
-          },
-          {
-            type: "report",
-            name: "Relatório",
-            description: "Template para relatórios executivos",
-            template: "business/report.hbs",
-          },
-          {
-            type: "invoice",
-            name: "Fatura/Invoice",
-            description: "Template para faturas e notas fiscais",
-            template: "business/invoice.hbs",
-          },
           {
             type: "budget-premium",
             name: "Orçamento Premium",
@@ -86,29 +227,49 @@ module.exports = fp(
             template: "business/budget-premium.hbs",
           },
         ],
-        medical: [
-          {
-            type: "anamnesis",
-            name: "Ficha de Anamnese",
-            description: "Template para fichas médicas de anamnese",
-            template: "medical/anamnesis.hbs",
-          },
-          {
-            type: "prescription",
-            name: "Receita Médica",
-            description: "Template para receitas médicas",
-            template: "medical/prescription.hbs",
-          },
-          {
-            type: "clinical_form",
-            name: "Formulário Clínico",
-            description: "Template para formulários clínicos personalizados",
-            template: "medical/clinical_form.hbs",
-          },
-        ],
       };
+    }
 
-      return templates;
+    /**
+     * Força refresh do cache de templates
+     */
+    async function refreshTemplatesCache() {
+      templatesCache = null;
+      lastScanTime = 0;
+      app.log.info("🔄 Cache de templates invalidado");
+      return await getAvailableTemplates();
+    }
+
+    /**
+     * Escaneia uma pasta específica de templates
+     */
+    async function scanTemplateFolder(folderName) {
+      const templatesDir = path.resolve("src/templates", folderName);
+
+      try {
+        const files = await fs.readdir(templatesDir);
+        const templates = [];
+
+        for (const file of files) {
+          if (file.endsWith(".hbs")) {
+            const templatePath = path.join(templatesDir, file);
+            const templateInfo = await parseTemplateMetadata(
+              templatePath,
+              folderName,
+              file
+            );
+
+            if (templateInfo) {
+              templates.push(templateInfo);
+            }
+          }
+        }
+
+        return templates;
+      } catch (error) {
+        app.log.error(`❌ Erro ao escanear pasta ${folderName}:`, error);
+        return [];
+      }
     }
 
     /**
@@ -121,6 +282,16 @@ module.exports = fp(
     }
 
     /**
+     * Retorna informações sobre um template específico
+     */
+    async function getTemplateData(templateType) {
+      const templates = await getAvailableTemplates();
+      const allTemplates = Object.values(templates).flat();
+
+      return allTemplates.find((t) => t.type === templateType) || null;
+    }
+
+    /**
      * Processa e valida os dados específicos do template
      */
     function processTemplateData(templateType, data) {
@@ -130,7 +301,7 @@ module.exports = fp(
         logo: processLogoTemplate,
         watermark: processWatermarkTemplate,
 
-        // Templates educacionais
+        // Templates educacionais/gerais
         exam: processExamTemplate,
         assessment: processAssessmentTemplate,
         quiz: processQuizTemplate,
@@ -140,7 +311,6 @@ module.exports = fp(
         invoice: processInvoiceTemplate,
         "budget-premium": processBudgetPremiumTemplate,
         report: processReportTemplate,
-        invoice: processInvoiceTemplate,
 
         // Templates médicos
         anamnesis: processAnamnesisTemplate,
@@ -150,9 +320,10 @@ module.exports = fp(
 
       const processor = processors[templateType];
       if (!processor) {
-        throw new Error(
-          `Processador não encontrado para template: ${templateType}`
+        app.log.warn(
+          `⚠️ Processador não encontrado para template: ${templateType}, usando processador básico`
         );
+        return processBasicTemplate(data);
       }
 
       return processor(data);
@@ -195,17 +366,8 @@ module.exports = fp(
       }
     }
 
-    /**
-     * Retorna informações sobre um template específico
-     */
-    async function getTemplateData(templateType) {
-      const templates = await getAvailableTemplates();
-      const allTemplates = Object.values(templates).flat();
-
-      return allTemplates.find((t) => t.type === templateType) || null;
-    }
-
     // ========== PROCESSADORES DE TEMPLATES ==========
+    // (Mantém todos os processadores existentes)
 
     function processBasicTemplate(data) {
       const now = new Date();
@@ -244,7 +406,6 @@ module.exports = fp(
       const budget = data.budget || {};
       const items = budget.items || [];
 
-      // Calcula totais
       const subtotal = items.reduce((sum, item) => {
         return sum + item.quantity * item.unitPrice;
       }, 0);
@@ -277,7 +438,6 @@ module.exports = fp(
 
     function processExamTemplate(data) {
       const exam = data.exam || {};
-
       return {
         title: data.title || "Exame",
         date: new Date(),
@@ -287,6 +447,38 @@ module.exports = fp(
           instructions: exam.instructions || "",
           questions: exam.questions || [],
           ...exam,
+        },
+        ...data,
+      };
+    }
+
+    function processAssessmentTemplate(data) {
+      const assessment = data.assessment || {};
+      return {
+        title: data.title || "Avaliação",
+        date: new Date(),
+        assessment: {
+          subject: assessment.subject || "",
+          period: assessment.period || "",
+          criteria: assessment.criteria || [],
+          sections: assessment.sections || [],
+          ...assessment,
+        },
+        ...data,
+      };
+    }
+
+    function processQuizTemplate(data) {
+      const quiz = data.quiz || {};
+      return {
+        title: data.title || "Quiz",
+        date: new Date(),
+        quiz: {
+          subject: quiz.subject || "",
+          duration: quiz.duration || "",
+          questions: quiz.questions || [],
+          totalPoints: quiz.totalPoints || 0,
+          ...quiz,
         },
         ...data,
       };
@@ -305,34 +497,20 @@ module.exports = fp(
       };
     }
 
-    function processAssessmentTemplate(data) {
-      return processExamTemplate(data); // Similar ao exam
-    }
-
-    function processQuizTemplate(data) {
-      return processExamTemplate(data); // Similar ao exam
-    }
-
     function processInvoiceTemplate(data) {
-      return processBudgetTemplate(data); // Similar ao budget
+      return processBudgetTemplate(data);
     }
 
     function processBudgetPremiumTemplate(data) {
       const budget = data.budget || {};
       const items = budget.items || [];
 
-      // Calcula totais corretamente
       const processedItems = items.map((item) => {
         const quantity = parseFloat(item.quantity) || 0;
         const unitPrice = parseFloat(item.unitPrice) || 0;
         const total = quantity * unitPrice;
 
-        return {
-          ...item,
-          quantity,
-          unitPrice,
-          total,
-        };
+        return { ...item, quantity, unitPrice, total };
       });
 
       const subtotal = processedItems.reduce(
@@ -341,7 +519,6 @@ module.exports = fp(
       );
       const discountAmount = parseFloat(budget.discount) || 0;
       const taxRate = parseFloat(budget.taxRate) || 0;
-
       const baseForTax = subtotal - discountAmount;
       const taxAmount = baseForTax * (taxRate / 100);
       const total = baseForTax + taxAmount;
@@ -352,17 +529,10 @@ module.exports = fp(
         budget: {
           ...budget,
           items: processedItems,
-          calculations: {
-            subtotal,
-            discountAmount,
-            taxRate,
-            taxAmount,
-            total,
-          },
+          calculations: { subtotal, discountAmount, taxRate, taxAmount, total },
         },
       };
 
-      // Configuração do logo (cabeçalho e marca d'água)
       if (data.logo?.url) {
         processedData.logo = {
           url: data.logo.url,
@@ -371,10 +541,8 @@ module.exports = fp(
         };
       }
 
-      // Configuração da marca d'água (logo OU texto)
       if (data.watermark) {
         if (data.watermark.type === "logo" && data.watermark.logo?.url) {
-          // Marca d'água tipo logo
           processedData.watermark = {
             type: "logo",
             logo: {
@@ -385,7 +553,6 @@ module.exports = fp(
             },
           };
         } else {
-          // Marca d'água tipo texto (padrão)
           processedData.watermark = {
             type: "text",
             text: data.watermark.text || "CONFIDENCIAL",
@@ -428,9 +595,12 @@ module.exports = fp(
         ...data,
       };
     }
+
+    // Inicializa o cache na inicialização do plugin
+    await getAvailableTemplates();
   },
   {
     name: "template-service",
-    dependencies: ["handlebars"], // Garante que handlebars seja carregado antes
+    dependencies: ["handlebars"],
   }
 );

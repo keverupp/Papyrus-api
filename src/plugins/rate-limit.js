@@ -13,8 +13,8 @@ module.exports = fp(async (app) => {
       // Retorna o limite específico da API key
       const limit = request.apiKey.requests_per_minute;
 
-      // Se é 0, significa unlimited
-      return limit === 0 ? false : limit;
+      // Se é 0, significa unlimited - retorna número muito alto ao invés de false
+      return limit === 0 ? 999999 : limit;
     },
 
     timeWindow: "1 minute",
