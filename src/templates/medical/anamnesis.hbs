@@ -1,0 +1,733 @@
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{title}}</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; } body { font-family:
+      'Segoe UI', 'Helvetica Neue', 'Arial', sans-serif; font-size: 10px;
+      line-height: 1.4; color: #2c3e50; background: #fff; letter-spacing:
+      0.02em; } .container { width: 100%; max-width: 800px; margin: 0 auto;
+      padding: 20px; position: relative; } /* === CABEÇALHO === */ .header {
+      text-align: center; margin-bottom: 25px; border-bottom: 3px solid #2c3e50;
+      padding-bottom: 15px; background: linear-gradient(135deg, #f8f9fa 0%,
+      #ecf0f1 100%); margin: -20px -20px 25px -20px; padding: 20px 20px 15px
+      20px; border-radius: 8px 8px 0 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+      .header h1 { font-size: 22px; font-weight: 700; margin-bottom: 8px; color:
+      #2c3e50; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0
+      1px 2px rgba(0,0,0,0.1); } .header .clinic-info { font-size: 11px; color:
+      #7f8c8d; font-weight: 500; margin-top: 5px; } .header .anamnesis-date {
+      font-size: 10px; color: #95a5a6; margin-top: 8px; font-style: italic; } /*
+      === INFORMAÇÕES DO MÉDICO === */ .doctor-section { background:
+      linear-gradient(135deg, #e8f4fd 0%, #f0f8ff 100%); border: 1px solid
+      #3498db; border-left: 4px solid #3498db; padding: 12px; margin-bottom:
+      20px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+      .doctor-section h3 { font-size: 12px; color: #2c3e50; margin-bottom: 10px;
+      font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 1px solid #bdc3c7; padding-bottom: 5px; } .doctor-info {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 9px;
+      } .doctor-info .info-item { display: flex; flex-direction: column; }
+      .doctor-info .info-label { font-weight: 600; color: #7f8c8d; font-size:
+      8px; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 3px;
+      } .doctor-info .info-value { color: #2c3e50; font-weight: 500; } /* ===
+      DADOS DO PACIENTE === */ .patient-section { background:
+      linear-gradient(135deg, #fff5f5 0%, #fef9f9 100%); border: 1px solid
+      #e74c3c; border-left: 4px solid #e74c3c; padding: 12px; margin-bottom:
+      20px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+      .patient-section h3 { font-size: 12px; color: #2c3e50; margin-bottom:
+      10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+      border-bottom: 1px solid #bdc3c7; padding-bottom: 5px; }
+      .patient-basic-info { display: grid; grid-template-columns: 2fr 1fr 1fr
+      1fr; gap: 15px; margin-bottom: 12px; } .patient-contact-info { display:
+      grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 12px;
+      } .form-field { display: flex; flex-direction: column; } .form-field label
+      { font-weight: 600; color: #7f8c8d; font-size: 8px; text-transform:
+      uppercase; letter-spacing: 0.3px; margin-bottom: 4px; } .form-field
+      .field-value { min-height: 20px; border-bottom: 1px solid #2c3e50;
+      padding-bottom: 2px; font-size: 10px; color: #2c3e50; font-weight: 500; }
+      .form-field .field-input { min-height: 20px; border-bottom: 1px solid
+      #2c3e50; padding-bottom: 2px; } /* === SEÇÕES DE ANAMNESE === */
+      .anamnesis-section { margin-bottom: 25px; page-break-inside: avoid; }
+      .section-header { background: linear-gradient(135deg, #f0fff4 0%, #f9fff9
+      100%); border: 1px solid #27ae60; border-left: 4px solid #27ae60; padding:
+      8px 12px; margin-bottom: 12px; border-radius: 6px; box-shadow: 0 2px 4px
+      rgba(0,0,0,0.05); } .section-header h4 { font-size: 11px; color: #2c3e50;
+      font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;
+      margin: 0; } .section-content { background: #fafbfc; border: 1px solid
+      #ecf0f1; padding: 15px; border-radius: 6px; box-shadow: 0 1px 3px
+      rgba(0,0,0,0.05); } /* === CAMPOS DE TEXTO LIVRE === */ .text-area {
+      min-height: 80px; border: 1px solid #d5dbdb; border-radius: 4px; padding:
+      8px; background: linear-gradient(to bottom, #fdfdfd 0%, #f8f9fa 100%);
+      position: relative; overflow: hidden; } .text-area.large { min-height:
+      120px; } .text-area.xlarge { min-height: 160px; } .text-lines { position:
+      absolute; top: 8px; left: 8px; right: 8px; bottom: 8px; display: flex;
+      flex-direction: column; justify-content: space-between; } .text-line {
+      border-bottom: 1px dotted #bdc3c7; height: 18px; flex: 1; min-height:
+      16px; position: relative; } .text-line::before { content: ''; position:
+      absolute; left: 0; top: 50%; width: 2px; height: 2px; background: #e74c3c;
+      border-radius: 50%; transform: translateY(-50%); opacity: 0.3; } /* ===
+      CAMPOS DE CHECKBOX === */ .checkbox-group { display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px;
+      margin: 10px 0; } .checkbox-item { display: flex; align-items: center;
+      font-size: 9px; padding: 4px; } .checkbox { width: 12px; height: 12px;
+      border: 1px solid #2c3e50; margin-right: 8px; border-radius: 2px;
+      flex-shrink: 0; } .checkbox-label { color: #2c3e50; font-weight: 500; } /*
+      === CAMPOS DE ESCALA === */ .scale-field { display: flex; align-items:
+      center; gap: 10px; margin: 8px 0; font-size: 9px; } .scale-field label {
+      font-weight: 600; color: #7f8c8d; min-width: 100px; } .scale-numbers {
+      display: flex; gap: 5px; } .scale-number { width: 20px; height: 20px;
+      border: 1px solid #2c3e50; border-radius: 50%; display: flex; align-items:
+      center; justify-content: center; font-size: 8px; font-weight: 600; } /*
+      === TABELAS === */ .medical-table { width: 100%; border-collapse:
+      collapse; margin: 12px 0; border: 1px solid #d5dbdb; border-radius: 4px;
+      overflow: hidden; } .medical-table th { background: #34495e; color: white;
+      padding: 8px; font-size: 9px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.3px; } .medical-table td { padding: 10px 8px;
+      border-bottom: 1px solid #ecf0f1; font-size: 9px; vertical-align: top; }
+      .medical-table tr:nth-child(even) { background: #f8f9fa; } /* ===
+      ASSINATURA === */ .signature-section { margin-top: 40px; padding-top:
+      20px; border-top: 2px solid #ecf0f1; display: flex; justify-content:
+      space-between; align-items: end; } .signature-box { text-align: center;
+      min-width: 200px; } .signature-line { border-bottom: 2px solid #2c3e50;
+      margin-bottom: 8px; height: 40px; } .signature-label { font-size: 8px;
+      color: #7f8c8d; font-weight: 500; } .signature-info { font-size: 9px;
+      color: #7f8c8d; } .signature-info strong { font-weight: 600; color:
+      #34495e; } /* === RODAPÉ === */ .footer { text-align: center; font-size:
+      8px; color: #95a5a6; border-top: 1px solid #ecf0f1; padding-top: 15px;
+      margin-top: 30px; font-weight: 400; } /* === IMPRESSÃO === */ @media print
+      { body { font-size: 9pt; color: #000; -webkit-print-color-adjust: exact;
+      color-adjust: exact; } .container { padding: 0; max-width: 100%; }
+      .doctor-section, .patient-section, .section-content, .anamnesis-section {
+      background: #fff !important; box-shadow: none !important; border-color:
+      #999 !important; } .header { background: #fff !important; box-shadow: none
+      !important; } .text-line { border-bottom: 1px solid #ccc !important; }
+      .text-line::before { display: none !important; } .anamnesis-section,
+      .signature-section { page-break-inside: avoid; } } /* === RESPONSIVIDADE
+      === */ @media (max-width: 768px) { .container { padding: 12px; }
+      .patient-basic-info { grid-template-columns: 1fr; gap: 10px; }
+      .patient-contact-info { grid-template-columns: 1fr; gap: 10px; }
+      .doctor-info { grid-template-columns: 1fr; gap: 8px; } .checkbox-group {
+      grid-template-columns: 1fr; } .signature-section { flex-direction: column;
+      gap: 20px; text-align: center; } }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- CABEÇALHO -->
+      <div class="header">
+        <h1>{{title}}</h1>
+        {{#if anamnesis.clinic}}
+          <div class="clinic-info">{{anamnesis.clinic}}</div>
+        {{/if}}
+        <div class="anamnesis-date">Data da Anamnese:
+          {{date "DD/MM/YYYY"}}</div>
+      </div>
+
+      <!-- INFORMAÇÕES DO MÉDICO -->
+      {{#if doctor}}
+        <div class="doctor-section">
+          <h3>Dados do Médico</h3>
+          <div class="doctor-info">
+            <div class="info-item">
+              <span class="info-label">Nome:</span>
+              <span class="info-value">{{doctor.name}}</span>
+            </div>
+            {{#if doctor.crm}}
+              <div class="info-item">
+                <span class="info-label">CRM:</span>
+                <span class="info-value">{{doctor.crm}}</span>
+              </div>
+            {{/if}}
+            {{#if doctor.specialty}}
+              <div class="info-item">
+                <span class="info-label">Especialidade:</span>
+                <span class="info-value">{{doctor.specialty}}</span>
+              </div>
+            {{/if}}
+            {{#if doctor.phone}}
+              <div class="info-item">
+                <span class="info-label">Telefone:</span>
+                <span class="info-value">{{doctor.phone}}</span>
+              </div>
+            {{/if}}
+          </div>
+        </div>
+      {{/if}}
+
+      <!-- DADOS DO PACIENTE -->
+      <div class="patient-section">
+        <h3>Dados do Paciente</h3>
+
+        <div class="patient-basic-info">
+          <div class="form-field">
+            <label>Nome Completo:</label>
+            {{#if patient.name}}
+              <div class="field-value">{{patient.name}}</div>
+            {{else}}
+              <div class="field-input"></div>
+            {{/if}}
+          </div>
+          <div class="form-field">
+            <label>Data de Nascimento:</label>
+            {{#if patient.birthDate}}
+              <div class="field-value">{{date
+                  patient.birthDate
+                  "DD/MM/YYYY"
+                }}</div>
+            {{else}}
+              <div class="field-input"></div>
+            {{/if}}
+          </div>
+          <div class="form-field">
+            <label>Idade:</label>
+            {{#if patient.age}}
+              <div class="field-value">{{patient.age}} anos</div>
+            {{else}}
+              <div class="field-input"></div>
+            {{/if}}
+          </div>
+          <div class="form-field">
+            <label>Sexo:</label>
+            {{#if patient.gender}}
+              <div class="field-value">{{patient.gender}}</div>
+            {{else}}
+              <div class="field-input"></div>
+            {{/if}}
+          </div>
+        </div>
+
+        <div class="patient-contact-info">
+          <div class="form-field">
+            <label>CPF:</label>
+            {{#if patient.document}}
+              <div class="field-value">{{patient.document}}</div>
+            {{else}}
+              <div class="field-input"></div>
+            {{/if}}
+          </div>
+          <div class="form-field">
+            <label>Telefone:</label>
+            {{#if patient.phone}}
+              <div class="field-value">{{patient.phone}}</div>
+            {{else}}
+              <div class="field-input"></div>
+            {{/if}}
+          </div>
+          <div class="form-field">
+            <label>E-mail:</label>
+            {{#if patient.email}}
+              <div class="field-value">{{patient.email}}</div>
+            {{else}}
+              <div class="field-input"></div>
+            {{/if}}
+          </div>
+        </div>
+
+        {{#if patient.address}}
+          <div class="form-field">
+            <label>Endereço Completo:</label>
+            <div class="field-value">{{patient.address}}</div>
+          </div>
+        {{else}}
+          <div class="form-field">
+            <label>Endereço Completo:</label>
+            <div class="field-input"></div>
+          </div>
+        {{/if}}
+      </div>
+
+      <!-- QUEIXA PRINCIPAL -->
+      <div class="anamnesis-section">
+        <div class="section-header">
+          <h4>Queixa Principal</h4>
+        </div>
+        <div class="section-content">
+          {{#if anamnesis.chiefComplaint}}
+            <div class="text-area">
+              <div style="padding: 8px; font-size: 10px; line-height: 1.5;">
+                {{{br anamnesis.chiefComplaint}}}
+              </div>
+            </div>
+          {{else}}
+            <div class="text-area">
+              <div class="text-lines">
+                {{#times 4}}
+                  <div class="text-line"></div>
+                {{/times}}
+              </div>
+            </div>
+          {{/if}}
+        </div>
+      </div>
+
+      <!-- HISTÓRIA DA DOENÇA ATUAL -->
+      <div class="anamnesis-section">
+        <div class="section-header">
+          <h4>História da Doença Atual</h4>
+        </div>
+        <div class="section-content">
+          {{#if anamnesis.currentIllness}}
+            <div class="text-area large">
+              <div style="padding: 8px; font-size: 10px; line-height: 1.5;">
+                {{{br anamnesis.currentIllness}}}
+              </div>
+            </div>
+          {{else}}
+            <div class="text-area large">
+              <div class="text-lines">
+                {{#times 6}}
+                  <div class="text-line"></div>
+                {{/times}}
+              </div>
+            </div>
+          {{/if}}
+        </div>
+      </div>
+
+      <!-- ANTECEDENTES PESSOAIS -->
+      <div class="anamnesis-section">
+        <div class="section-header">
+          <h4>Antecedentes Pessoais</h4>
+        </div>
+        <div class="section-content">
+          <!-- Doenças Prévias -->
+          <div style="margin-bottom: 15px;">
+            <label
+              style="font-weight: 600; color: #7f8c8d; font-size: 9px; display: block; margin-bottom: 8px;"
+            >DOENÇAS PRÉVIAS:</label>
+            {{#if anamnesis.previousDiseases}}
+              <div class="checkbox-group">
+                {{#each anamnesis.previousDiseases}}
+                  <div class="checkbox-item">
+                    <div class="checkbox">{{#if checked}}✓{{/if}}</div>
+                    <span class="checkbox-label">{{name}}</span>
+                  </div>
+                {{/each}}
+              </div>
+            {{else}}
+              <div class="checkbox-group">
+                <div class="checkbox-item">
+                  <div class="checkbox"></div>
+                  <span class="checkbox-label">Diabetes</span>
+                </div>
+                <div class="checkbox-item">
+                  <div class="checkbox"></div>
+                  <span class="checkbox-label">Hipertensão</span>
+                </div>
+                <div class="checkbox-item">
+                  <div class="checkbox"></div>
+                  <span class="checkbox-label">Cardiopatias</span>
+                </div>
+                <div class="checkbox-item">
+                  <div class="checkbox"></div>
+                  <span class="checkbox-label">Depressão</span>
+                </div>
+                <div class="checkbox-item">
+                  <div class="checkbox"></div>
+                  <span class="checkbox-label">Ansiedade</span>
+                </div>
+                <div class="checkbox-item">
+                  <div class="checkbox"></div>
+                  <span class="checkbox-label">Outras</span>
+                </div>
+              </div>
+            {{/if}}
+          </div>
+
+          <!-- Medicações em Uso -->
+          <div style="margin-bottom: 15px;">
+            <label
+              style="font-weight: 600; color: #7f8c8d; font-size: 9px; display: block; margin-bottom: 8px;"
+            >MEDICAÇÕES EM USO:</label>
+            {{#if anamnesis.currentMedications}}
+              <div class="text-area">
+                <div style="padding: 8px; font-size: 10px; line-height: 1.5;">
+                  {{{br anamnesis.currentMedications}}}
+                </div>
+              </div>
+            {{else}}
+              <div class="text-area">
+                <div class="text-lines">
+                  {{#times 3}}
+                    <div class="text-line"></div>
+                  {{/times}}
+                </div>
+              </div>
+            {{/if}}
+          </div>
+
+          <!-- Alergias -->
+          <div>
+            <label
+              style="font-weight: 600; color: #7f8c8d; font-size: 9px; display: block; margin-bottom: 8px;"
+            >ALERGIAS:</label>
+            {{#if anamnesis.allergies}}
+              <div class="text-area">
+                <div
+                  style="padding: 8px; font-size: 10px; line-height: 1.5; color: #c0392b;"
+                >
+                  {{{br anamnesis.allergies}}}
+                </div>
+              </div>
+            {{else}}
+              <div class="text-area">
+                <div class="text-lines">
+                  {{#times 2}}
+                    <div class="text-line"></div>
+                  {{/times}}
+                </div>
+              </div>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+
+      <!-- ANTECEDENTES FAMILIARES -->
+      <div class="anamnesis-section">
+        <div class="section-header">
+          <h4>Antecedentes Familiares</h4>
+        </div>
+        <div class="section-content">
+          {{#if anamnesis.familyHistory}}
+            <div class="text-area">
+              <div style="padding: 8px; font-size: 10px; line-height: 1.5;">
+                {{{br anamnesis.familyHistory}}}
+              </div>
+            </div>
+          {{else}}
+            <div class="text-area">
+              <div class="text-lines">
+                {{#times 4}}
+                  <div class="text-line"></div>
+                {{/times}}
+              </div>
+            </div>
+          {{/if}}
+        </div>
+      </div>
+
+      <!-- HÁBITOS DE VIDA -->
+      <div class="anamnesis-section">
+        <div class="section-header">
+          <h4>Hábitos de Vida</h4>
+        </div>
+        <div class="section-content">
+          <div class="checkbox-group">
+            {{#if anamnesis.habits}}
+              {{#each anamnesis.habits}}
+                <div class="checkbox-item">
+                  <div class="checkbox">{{#if checked}}✓{{/if}}</div>
+                  <span class="checkbox-label">{{name}}</span>
+                </div>
+              {{/each}}
+            {{else}}
+              <div class="checkbox-item">
+                <div class="checkbox"></div>
+                <span class="checkbox-label">Tabagismo</span>
+              </div>
+              <div class="checkbox-item">
+                <div class="checkbox"></div>
+                <span class="checkbox-label">Etilismo</span>
+              </div>
+              <div class="checkbox-item">
+                <div class="checkbox"></div>
+                <span class="checkbox-label">Atividade Física Regular</span>
+              </div>
+              <div class="checkbox-item">
+                <div class="checkbox"></div>
+                <span class="checkbox-label">Alimentação Balanceada</span>
+              </div>
+              <div class="checkbox-item">
+                <div class="checkbox"></div>
+                <span class="checkbox-label">Sono Adequado</span>
+              </div>
+              <div class="checkbox-item">
+                <div class="checkbox"></div>
+                <span class="checkbox-label">Estresse Frequente</span>
+              </div>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+
+      <!-- EXAME FÍSICO -->
+      <div class="anamnesis-section">
+        <div class="section-header">
+          <h4>Exame Físico</h4>
+        </div>
+        <div class="section-content">
+          <!-- Sinais Vitais -->
+          <div style="margin-bottom: 15px;">
+            <label
+              style="font-weight: 600; color: #7f8c8d; font-size: 9px; display: block; margin-bottom: 8px;"
+            >SINAIS VITAIS:</label>
+            <div
+              style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;"
+            >
+              <div class="form-field">
+                <label>PA:</label>
+                {{#if anamnesis.vitalSigns.bloodPressure}}
+                  <div
+                    class="field-value"
+                  >{{anamnesis.vitalSigns.bloodPressure}} mmHg</div>
+                {{else}}
+                  <div class="field-input"></div>
+                {{/if}}
+              </div>
+              <div class="form-field">
+                <label>FC:</label>
+                {{#if anamnesis.vitalSigns.heartRate}}
+                  <div class="field-value">{{anamnesis.vitalSigns.heartRate}}
+                    bpm</div>
+                {{else}}
+                  <div class="field-input"></div>
+                {{/if}}
+              </div>
+              <div class="form-field">
+                <label>FR:</label>
+                {{#if anamnesis.vitalSigns.respiratoryRate}}
+                  <div
+                    class="field-value"
+                  >{{anamnesis.vitalSigns.respiratoryRate}} ipm</div>
+                {{else}}
+                  <div class="field-input"></div>
+                {{/if}}
+              </div>
+              <div class="form-field">
+                <label>Temp:</label>
+                {{#if anamnesis.vitalSigns.temperature}}
+                  <div
+                    class="field-value"
+                  >{{anamnesis.vitalSigns.temperature}}°C</div>
+                {{else}}
+                  <div class="field-input"></div>
+                {{/if}}
+              </div>
+              <div class="form-field">
+                <label>Peso:</label>
+                {{#if anamnesis.vitalSigns.weight}}
+                  <div class="field-value">{{anamnesis.vitalSigns.weight}}
+                    kg</div>
+                {{else}}
+                  <div class="field-input"></div>
+                {{/if}}
+              </div>
+              <div class="form-field">
+                <label>Altura:</label>
+                {{#if anamnesis.vitalSigns.height}}
+                  <div class="field-value">{{anamnesis.vitalSigns.height}}
+                    cm</div>
+                {{else}}
+                  <div class="field-input"></div>
+                {{/if}}
+              </div>
+            </div>
+          </div>
+
+          <!-- Exame Físico Geral -->
+          <div>
+            <label
+              style="font-weight: 600; color: #7f8c8d; font-size: 9px; display: block; margin-bottom: 8px;"
+            >EXAME FÍSICO GERAL:</label>
+            {{#if anamnesis.physicalExam}}
+              <div class="text-area large">
+                <div style="padding: 8px; font-size: 10px; line-height: 1.5;">
+                  {{{br anamnesis.physicalExam}}}
+                </div>
+              </div>
+            {{else}}
+              <div class="text-area large">
+                <div class="text-lines">
+                  {{#times 6}}
+                    <div class="text-line"></div>
+                  {{/times}}
+                </div>
+              </div>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+
+      <!-- AVALIAÇÃO E CONDUTA -->
+      <div class="anamnesis-section">
+        <div class="section-header">
+          <h4>Avaliação e Conduta</h4>
+        </div>
+        <div class="section-content">
+          <!-- Hipóteses Diagnósticas -->
+          <div style="margin-bottom: 15px;">
+            <label
+              style="font-weight: 600; color: #7f8c8d; font-size: 9px; display: block; margin-bottom: 8px;"
+            >HIPÓTESES DIAGNÓSTICAS:</label>
+            {{#if anamnesis.diagnosis}}
+              <div class="text-area">
+                <div style="padding: 8px; font-size: 10px; line-height: 1.5;">
+                  {{{br anamnesis.diagnosis}}}
+                </div>
+              </div>
+            {{else}}
+              <div class="text-area">
+                <div class="text-lines">
+                  {{#times 3}}
+                    <div class="text-line"></div>
+                  {{/times}}
+                </div>
+              </div>
+            {{/if}}
+          </div>
+
+          <!-- Conduta/Tratamento -->
+          <div style="margin-bottom: 15px;">
+            <label
+              style="font-weight: 600; color: #7f8c8d; font-size: 9px; display: block; margin-bottom: 8px;"
+            >CONDUTA/TRATAMENTO:</label>
+            {{#if anamnesis.treatment}}
+              <div class="text-area">
+                <div style="padding: 8px; font-size: 10px; line-height: 1.5;">
+                  {{{br anamnesis.treatment}}}
+                </div>
+              </div>
+            {{else}}
+              <div class="text-area">
+                <div class="text-lines">
+                  {{#times 4}}
+                    <div class="text-line"></div>
+                  {{/times}}
+                </div>
+              </div>
+            {{/if}}
+          </div>
+
+          <!-- Exames Solicitados -->
+          <div>
+            <label
+              style="font-weight: 600; color: #7f8c8d; font-size: 9px; display: block; margin-bottom: 8px;"
+            >EXAMES SOLICITADOS:</label>
+            {{#if anamnesis.examsRequested}}
+              <div class="text-area">
+                <div style="padding: 8px; font-size: 10px; line-height: 1.5;">
+                  {{{br anamnesis.examsRequested}}}
+                </div>
+              </div>
+            {{else}}
+              <div class="text-area">
+                <div class="text-lines">
+                  {{#times 3}}
+                    <div class="text-line"></div>
+                  {{/times}}
+                </div>
+              </div>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+
+      <!-- OBSERVAÇÕES GERAIS -->
+      {{#if anamnesis.observations}}
+        <div class="anamnesis-section">
+          <div class="section-header">
+            <h4>Observações Gerais</h4>
+          </div>
+          <div class="section-content">
+            <div class="text-area large">
+              <div style="padding: 8px; font-size: 10px; line-height: 1.5;">
+                {{{br anamnesis.observations}}}
+              </div>
+            </div>
+          </div>
+        </div>
+      {{/if}}
+
+      <!-- ESCALA DE DOR (se aplicável) -->
+      {{#if anamnesis.painScale}}
+        <div class="anamnesis-section">
+          <div class="section-header">
+            <h4>Escala de Dor</h4>
+          </div>
+          <div class="section-content">
+            <div class="scale-field">
+              <label>Intensidade da dor (0-10):</label>
+              <div class="scale-numbers">
+                {{#times 11}}
+                  <div class="scale-number">{{@index}}</div>
+                {{/times}}
+              </div>
+            </div>
+            <div style="margin-top: 10px; font-size: 8px; color: #7f8c8d;">
+              0 = Sem dor | 10 = Dor insuportável
+            </div>
+            {{#if anamnesis.painDescription}}
+              <div style="margin-top: 10px;">
+                <label
+                  style="font-weight: 600; color: #7f8c8d; font-size: 9px; display: block; margin-bottom: 5px;"
+                >CARACTERÍSTICAS DA DOR:</label>
+                <div style="font-size: 10px; line-height: 1.5;">
+                  {{{br anamnesis.painDescription}}}
+                </div>
+              </div>
+            {{/if}}
+          </div>
+        </div>
+      {{/if}}
+
+      <!-- RETORNO -->
+      <div class="anamnesis-section">
+        <div class="section-header">
+          <h4>Agendamento de Retorno</h4>
+        </div>
+        <div class="section-content">
+          <div
+            style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"
+          >
+            <div class="form-field">
+              <label>Data do Retorno:</label>
+              {{#if anamnesis.returnDate}}
+                <div class="field-value">{{date
+                    anamnesis.returnDate
+                    "DD/MM/YYYY"
+                  }}</div>
+              {{else}}
+                <div class="field-input"></div>
+              {{/if}}
+            </div>
+            <div class="form-field">
+              <label>Observações do Retorno:</label>
+              {{#if anamnesis.returnNotes}}
+                <div class="field-value">{{anamnesis.returnNotes}}</div>
+              {{else}}
+                <div class="field-input"></div>
+              {{/if}}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ASSINATURA -->
+      <div class="signature-section">
+        <div class="signature-info">
+          <strong>Data:</strong>
+          {{date "DD/MM/YYYY"}}<br />
+          <strong>Local:</strong>
+          ____________________
+        </div>
+        <div class="signature-box">
+          <div class="signature-line"></div>
+          <div class="signature-label">
+            {{#if
+              doctor.name
+            }}{{doctor.name}}{{else}}_______________________{{/if}}<br />
+            {{#if doctor.crm}}CRM: {{doctor.crm}}{{else}}CRM: _______________{{/if}}
+          </div>
+        </div>
+      </div>
+
+      <!-- RODAPÉ -->
+      <div class="footer">
+        Ficha de Anamnese gerada em
+        {{date "DD/MM/YYYY HH:mm"}}
+        via Papyrus API<br />
+        Documento confidencial - Uso restrito ao prontuário médico
+      </div>
+    </div>
+  </body>
+</html>
