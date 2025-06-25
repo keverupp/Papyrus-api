@@ -54,6 +54,11 @@ module.exports = fp(
         helmetEnabled: process.env.HELMET_ENABLED !== "false",
       },
 
+      // JWT
+      jwt: {
+        secret: process.env.JWT_SECRET || "secret",
+      },
+
       // Performance
       performance: {
         compression: process.env.ENABLE_COMPRESSION !== "false",

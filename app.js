@@ -25,12 +25,14 @@ app.register(autoload, {
   dir: path.join(__dirname, "src/routes"),
 });
 
-app
-  .listen({ host: "0.0.0.0", port: 4000 })
-  .then((address) => {
-    console.log(`🚀 Servidor rodando em: ${address}`);
-  })
-  .catch((err) => {
-    console.error("❌ Erro ao iniciar o servidor:", err);
-    process.exit(1);
-  });
+app.ready().then(() => {
+  app
+    .listen({ host: app.config.server.host, port: app.config.server.port })
+    .then((address) => {
+      console.log(`🚀 Servidor rodando em: ${address}`);
+    })
+    .catch((err) => {
+      console.error("❌ Erro ao iniciar o servidor:", err);
+      process.exit(1);
+    });
+});
