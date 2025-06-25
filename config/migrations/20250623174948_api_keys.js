@@ -1,5 +1,3 @@
-// config/migrations/20250623000001_api_keys.js
-
 exports.up = function (knex, Promise) {
   return knex.schema.createTable("api_keys", function (table) {
     table.increments("id");

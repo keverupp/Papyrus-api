@@ -4,10 +4,8 @@ const fp = require("fastify-plugin");
 
 module.exports = fp(
   async (app) => {
-    // Aguarda as configurações estarem disponíveis
-    const config = app.config || {
-      rateLimit: { default: 5, window: 60000 },
-    };
+    // Configurações já estão disponíveis via dependência
+    const config = app.config;
 
     app.register(require("@fastify/rate-limit"), {
       // Limite dinâmico baseado na API key
@@ -186,6 +184,6 @@ module.exports = fp(
   },
   {
     name: "rate-limit",
-    // Removido dependencies por enquanto
+    dependencies: ["config"], // Só depende das configurações por enquanto
   }
 );

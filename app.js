@@ -6,7 +6,9 @@ const autoload = require("@fastify/autoload");
 const fastify = require("fastify");
 
 const app = fastify({
-  logger: false,
+  logger: {
+    level: "info",
+  },
 });
 
 app.register(autoload, {

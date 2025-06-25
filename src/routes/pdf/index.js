@@ -54,54 +54,41 @@ module.exports = async (app) => {
     schema: pdfSchema,
     handler: async (request, reply) => {
       try {
-        const {
-          type,
-          title = "Documento",
-          data = {},
-          config = {},
-        } = request.body;
+        // Valida dados da requisição
+        const validation = app.pdfGeneratorService.validatePdfRequest(
+          request.body
+        );
+        if (!validation.isValid) {
+          return reply.code(400).send({
+            error: "Validation Error",
+            message: "Dados da requisição inválidos",
+            details: validation.errors,
+            statusCode: 400,
+          });
+        }
 
         // Log da requisição
-        app.log.info("Gerando PDF", {
-          api_key: request.apiKey.name,
-          template_type: type,
-          title,
+        app.log.info("Processando geração de PDF", {
+          api_key: request.apiKey?.name || "none",
+          template_type: request.body.type,
+          title: request.body.title,
         });
 
-        // Monta os dados para o template
-        const templateData = {
-          title,
-          ...data,
-        };
-
-        // Renderiza o template HTML
-        const htmlContent = await app.templateService.renderTemplate(
-          type,
-          templateData
-        );
-
-        // Configurações do PDF
-        const pdfConfig = {
-          templateType: type,
-          format: config.format || "A4",
-          landscape: config.orientation === "landscape",
-          margin: config.margin,
-          ...config,
-        };
-
-        // Gera o PDF
-        const pdfBuffer = await app.pdfService.generatePDF(
-          htmlContent,
-          pdfConfig
+        // Gera o PDF usando o service
+        const result = await app.pdfGeneratorService.generateFullPDF(
+          request.body
         );
 
         // Headers para download
         reply
-          .type("application/pdf")
-          .header("Content-Disposition", `attachment; filename="${title}.pdf"`)
-          .header("Content-Length", pdfBuffer.length);
+          .type(result.contentType)
+          .header(
+            "Content-Disposition",
+            `attachment; filename="${result.filename}"`
+          )
+          .header("Content-Length", result.buffer.length);
 
-        return reply.send(pdfBuffer);
+        return reply.send(result.buffer);
       } catch (error) {
         app.log.error("Erro ao gerar PDF:", error);
 
@@ -109,6 +96,7 @@ module.exports = async (app) => {
           error: "PDF Generation Failed",
           message: error.message,
           type: "generation_error",
+          statusCode: 500,
         });
       }
     },
@@ -133,6 +121,7 @@ module.exports = async (app) => {
         return reply.code(500).send({
           error: "Templates List Failed",
           message: error.message,
+          statusCode: 500,
         });
       }
     },
@@ -148,6 +137,7 @@ module.exports = async (app) => {
         properties: {
           type: { type: "string" },
         },
+        required: ["type"],
       },
     },
     handler: async (request, reply) => {
@@ -160,6 +150,7 @@ module.exports = async (app) => {
           return reply.code(404).send({
             error: "Template Not Found",
             message: `Template '${type}' não encontrado`,
+            statusCode: 404,
           });
         }
 
@@ -173,6 +164,7 @@ module.exports = async (app) => {
         return reply.code(500).send({
           error: "Template Fetch Failed",
           message: error.message,
+          statusCode: 500,
         });
       }
     },
@@ -185,18 +177,27 @@ module.exports = async (app) => {
     schema: pdfSchema,
     handler: async (request, reply) => {
       try {
-        const { type, title = "Documento", data = {} } = request.body;
+        // Valida dados da requisição
+        const validation = app.pdfGeneratorService.validatePdfRequest(
+          request.body
+        );
+        if (!validation.isValid) {
+          return reply.code(400).send({
+            error: "Validation Error",
+            message: "Dados da requisição inválidos",
+            details: validation.errors,
+            statusCode: 400,
+          });
+        }
 
-        // Monta os dados para o template
-        const templateData = {
-          title,
-          ...data,
-        };
+        app.log.info("Gerando preview HTML", {
+          api_key: request.apiKey?.name || "none",
+          template_type: request.body.type,
+        });
 
-        // Renderiza o template HTML
-        const htmlContent = await app.templateService.renderTemplate(
-          type,
-          templateData
+        // Gera preview HTML usando o service
+        const htmlContent = await app.pdfGeneratorService.generatePreviewHTML(
+          request.body
         );
 
         return reply.type("text/html").send(htmlContent);
@@ -206,22 +207,29 @@ module.exports = async (app) => {
         return reply.code(500).send({
           error: "Preview Generation Failed",
           message: error.message,
+          statusCode: 500,
         });
       }
     },
   });
 
-  // Rota para estatísticas da API key
+  // Rota para estatísticas da API key atual
   app.route({
     method: "GET",
     url: "/stats",
     handler: async (request, reply) => {
       try {
-        const apiKey = request.apiKey;
-
-        // Busca informações da key (sem mostrar a key real)
+        // Busca informações da key atual
         const keyInfo = await app.apiKeyService.listKeys();
-        const currentKey = keyInfo.find((k) => k.id === apiKey.id);
+        const currentKey = keyInfo.find((k) => k.id === request.apiKey.id);
+
+        if (!currentKey) {
+          return reply.code(404).send({
+            error: "API Key Not Found",
+            message: "API key não encontrada",
+            statusCode: 404,
+          });
+        }
 
         return reply.send({
           success: true,
@@ -240,8 +248,11 @@ module.exports = async (app) => {
         return reply.code(500).send({
           error: "Stats Fetch Failed",
           message: error.message,
+          statusCode: 500,
         });
       }
     },
   });
+
+  app.log.info("📄 Rotas de PDF registradas");
 };

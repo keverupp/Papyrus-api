@@ -19,12 +19,26 @@ module.exports = async (app) => {
     },
   };
 
-  // Middleware de autorização admin (apenas para keys unlimited)
+  // Middleware de autorização admin (apenas para keys unlimited) - CORRIGIDO
   const requireAdmin = async (request, reply) => {
-    if (request.apiKey.type !== "unlimited") {
+    // DEBUG: Log para verificar o que está chegando
+    app.log.info("Verificação de admin:", {
+      hasApiKey: !!request.apiKey,
+      apiKeyType: request.apiKey?.type,
+      apiKeyName: request.apiKey?.name,
+      apiKeyId: request.apiKey?.id,
+    });
+
+    if (!request.apiKey || request.apiKey.type !== "unlimited") {
       return reply.code(403).send({
         error: "Forbidden",
         message: "Apenas API keys unlimited podem gerenciar outras keys",
+        statusCode: 403,
+        debug: {
+          hasApiKey: !!request.apiKey,
+          currentType: request.apiKey?.type,
+          requiredType: "unlimited",
+        },
       });
     }
   };
@@ -49,6 +63,7 @@ module.exports = async (app) => {
           return reply.code(409).send({
             error: "Conflict",
             message: "Já existe uma API key com esse nome",
+            statusCode: 409,
           });
         }
 
@@ -61,7 +76,7 @@ module.exports = async (app) => {
         });
 
         app.log.info("Nova API key criada", {
-          created_by: request.apiKey.name,
+          created_by: request.apiKey?.name || "unknown",
           new_key_name: newKey.name,
           new_key_type: newKey.type,
         });
@@ -84,6 +99,7 @@ module.exports = async (app) => {
         return reply.code(500).send({
           error: "Internal Server Error",
           message: error.message,
+          statusCode: 500,
         });
       }
     },
@@ -109,6 +125,7 @@ module.exports = async (app) => {
         return reply.code(500).send({
           error: "Internal Server Error",
           message: error.message,
+          statusCode: 500,
         });
       }
     },
@@ -124,12 +141,13 @@ module.exports = async (app) => {
 
         // Busca informações completas da key
         const keys = await app.apiKeyService.listKeys();
-        const currentKey = keys.find((k) => k.id === apiKey.id);
+        const currentKey = keys.find((k) => k.id === apiKey?.id);
 
         if (!currentKey) {
           return reply.code(404).send({
             error: "Not Found",
             message: "API key não encontrada",
+            statusCode: 404,
           });
         }
 
@@ -152,6 +170,7 @@ module.exports = async (app) => {
         return reply.code(500).send({
           error: "Internal Server Error",
           message: error.message,
+          statusCode: 500,
         });
       }
     },
@@ -175,10 +194,11 @@ module.exports = async (app) => {
         const { id } = request.params;
 
         // Não permite desativar a própria key
-        if (id === request.apiKey.id) {
+        if (id === request.apiKey?.id) {
           return reply.code(400).send({
             error: "Bad Request",
             message: "Não é possível desativar sua própria API key",
+            statusCode: 400,
           });
         }
 
@@ -188,11 +208,12 @@ module.exports = async (app) => {
           return reply.code(404).send({
             error: "Not Found",
             message: "API key não encontrada",
+            statusCode: 404,
           });
         }
 
         app.log.info("API key desativada", {
-          deactivated_by: request.apiKey.name,
+          deactivated_by: request.apiKey?.name || "unknown",
           deactivated_key_id: id,
           deactivated_key_name: deactivatedKey.name,
         });
@@ -212,6 +233,7 @@ module.exports = async (app) => {
         return reply.code(500).send({
           error: "Internal Server Error",
           message: error.message,
+          statusCode: 500,
         });
       }
     },
@@ -249,4 +271,6 @@ module.exports = async (app) => {
       });
     },
   });
+
+  app.log.info("🔑 Rotas de API keys registradas");
 };

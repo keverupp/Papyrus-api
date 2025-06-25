@@ -18,7 +18,7 @@ API open-source para **geração de PDFs com templates personalizáveis**, const
 
 ```bash
 git clone https://github.com/keverupp/papyrus-api.git
-cd papyrus
+cd papyrus-api
 npm install
 
 # Configurar variáveis de ambiente
