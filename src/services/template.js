@@ -13,8 +13,10 @@ module.exports = fp(
 
     app.decorate("templateService", {
       getAvailableTemplates: getAvailableTemplates,
+      getTemplatesByLanguage: getTemplatesByLanguage,
       validateTemplateType: validateTemplateType,
       getTemplateData: getTemplateData,
+      getTemplateByLanguage: getTemplateByLanguage,
       processTemplateData: processTemplateData,
       renderTemplate: renderTemplate,
       refreshTemplatesCache: refreshTemplatesCache,
@@ -67,7 +69,7 @@ module.exports = fp(
                 if (templateInfo) {
                   categoryTemplates.push(templateInfo);
                   app.log.info(
-                    `✅ Template encontrado: ${templateInfo.type} (${templateInfo.name})`
+                    `✅ Template encontrado: ${templateInfo.type} (${templateInfo.name}) [${templateInfo.language}]`
                   );
                 }
               }
@@ -124,20 +126,31 @@ module.exports = fp(
             tags: metadata.tags || [],
             version: metadata.version || "1.0.0",
             author: metadata.author,
+            language: metadata.language || "pt-BR", // Novo campo
+            supportedLanguages: metadata.supportedlanguages
+              ? metadata.supportedlanguages.split(",").map((l) => l.trim())
+              : ["pt-BR"], // Novo campo
             lastModified: (await fs.stat(templatePath)).mtime,
           };
         } else {
           // Fallback: gera metadados básicos baseado no nome do arquivo
           const type = path.basename(fileName, ".hbs");
 
+          // Detecta idioma pelo sufixo do arquivo (ex: budget-premium.en-US.hbs)
+          const languageMatch = fileName.match(/\.([a-z]{2}-[A-Z]{2})\.hbs$/);
+          const detectedLanguage = languageMatch ? languageMatch[1] : "pt-BR";
+          const cleanType = type.replace(/\.[a-z]{2}-[A-Z]{2}$/, ""); // Remove sufixo de idioma
+
           return {
-            type: type,
-            name: generateDisplayName(type),
-            description: `Template ${type} (sem metadados)`,
+            type: cleanType,
+            name: generateDisplayName(cleanType),
+            description: `Template ${cleanType} (sem metadados)`,
             template: `${categoryName}/${fileName}`,
             category: categoryName,
             tags: [categoryName],
             version: "1.0.0",
+            language: detectedLanguage,
+            supportedLanguages: [detectedLanguage],
             lastModified: (await fs.stat(templatePath)).mtime,
           };
         }
@@ -208,6 +221,7 @@ module.exports = fp(
             name: "Página em Branco",
             description: "Documento básico sem formatação específica",
             template: "basic/blank.hbs",
+            language: "pt-BR",
           },
         ],
         educational: [
@@ -216,6 +230,7 @@ module.exports = fp(
             name: "Prova/Exame",
             description: "Template para provas e exames escolares",
             template: "educational/exam.hbs",
+            language: "pt-BR",
           },
         ],
         business: [
@@ -225,6 +240,7 @@ module.exports = fp(
             description:
               "Template de orçamento avançado com logo e marca d'água",
             template: "business/budget-premium.hbs",
+            language: "pt-BR",
           },
         ],
       };
@@ -292,6 +308,88 @@ module.exports = fp(
     }
 
     /**
+     * Lista templates disponíveis apenas no idioma específico (sem fallback)
+     */
+    async function getTemplatesByLanguage(language = "pt-BR") {
+      try {
+        const allTemplates = await getAvailableTemplates();
+        const filteredTemplates = {};
+
+        for (const [category, templates] of Object.entries(allTemplates)) {
+          // Filtra apenas templates do idioma específico
+          const languageTemplates = templates.filter((template) => {
+            return template.language === language;
+          });
+
+          // Só adiciona categoria se houver templates no idioma
+          if (languageTemplates.length > 0) {
+            filteredTemplates[category] = languageTemplates;
+          }
+        }
+
+        app.log.debug(`🎯 Templates filtrados para ${language}:`, {
+          categories: Object.keys(filteredTemplates).length,
+          total: Object.values(filteredTemplates).flat().length,
+        });
+
+        return filteredTemplates;
+      } catch (error) {
+        app.log.error(
+          `Erro ao filtrar templates por idioma ${language}:`,
+          error
+        );
+        return {};
+      }
+    }
+
+    /**
+     * Busca template específico por tipo e idioma
+     */
+    async function getTemplateByLanguage(templateType, language = "pt-BR") {
+      try {
+        const allTemplates = await getAvailableTemplates();
+        const flatTemplates = Object.values(allTemplates).flat();
+
+        // Procura template no idioma específico
+        const template = flatTemplates.find(
+          (t) => t.type === templateType && t.language === language
+        );
+
+        if (template) {
+          app.log.debug(
+            `✅ Template encontrado: ${templateType} em ${language}`
+          );
+          return template;
+        }
+
+        // Fallback para idioma padrão se não encontrar
+        if (language !== "pt-BR") {
+          const fallbackTemplate = flatTemplates.find(
+            (t) => t.type === templateType && t.language === "pt-BR"
+          );
+
+          if (fallbackTemplate) {
+            app.log.warn(
+              `⚠️ Template ${templateType} não encontrado em ${language}, usando pt-BR`
+            );
+            return fallbackTemplate;
+          }
+        }
+
+        app.log.error(
+          `❌ Template ${templateType} não encontrado em nenhum idioma`
+        );
+        return null;
+      } catch (error) {
+        app.log.error(
+          `Erro ao buscar template ${templateType} em ${language}:`,
+          error
+        );
+        return null;
+      }
+    }
+
+    /**
      * Processa e valida os dados específicos do template
      */
     function processTemplateData(templateType, data) {
@@ -344,10 +442,12 @@ module.exports = fp(
           );
         }
 
-        const templates = await getAvailableTemplates();
-        const allTemplates = Object.values(templates).flat();
+        // Detecta idioma se especificado nos dados
+        const language = data.language || "pt-BR";
 
-        const templateInfo = allTemplates.find((t) => t.type === templateType);
+        // Busca template no idioma específico
+        let templateInfo = await getTemplateByLanguage(templateType, language);
+
         if (!templateInfo) {
           throw new Error(`Template não encontrado: ${templateType}`);
         }

@@ -1,0 +1,102 @@
+{
+  "language": {
+    "code": "pt-BR",
+    "name": "Português (Brasil)",
+    "flag": "🇧🇷"
+  },
+  "categories": {
+    "basic": "Básicos",
+    "educational": "Educacionais",
+    "business": "Empresariais",
+    "medical": "Médicos",
+    "general": "Gerais"
+  },
+  "common": {
+    "fields": {
+      "name": "Nome",
+      "title": "Título",
+      "description": "Descrição",
+      "date": "Data",
+      "email": "E-mail",
+      "phone": "Telefone",
+      "address": "Endereço",
+      "document": "Documento",
+      "company": "Empresa",
+      "client": "Cliente",
+      "total": "Total",
+      "subtotal": "Subtotal",
+      "quantity": "Quantidade",
+      "price": "Preço",
+      "discount": "Desconto",
+      "tax": "Imposto"
+    },
+    "actions": {
+      "generate": "Gerar",
+      "download": "Baixar",
+      "preview": "Visualizar",
+      "cancel": "Cancelar",
+      "save": "Salvar",
+      "edit": "Editar",
+      "delete": "Excluir"
+    },
+    "messages": {
+      "success": "Sucesso!",
+      "error": "Erro!",
+      "loading": "Carregando...",
+      "not_found": "Não encontrado",
+      "invalid_data": "Dados inválidos",
+      "processing": "Processando...",
+      "completed": "Concluído!",
+      "failed": "Falhou!"
+    },
+    "status": {
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "pending": "Pendente",
+      "completed": "Concluído",
+      "failed": "Falhou",
+      "cancelled": "Cancelado"
+    }
+  },
+  "api": {
+    "errors": {
+      "unauthorized": "Não autorizado - API key necessária",
+      "forbidden": "Acesso negado",
+      "not_found": "Recurso não encontrado",
+      "validation_error": "Erro de validação nos dados",
+      "rate_limit": "Limite de requisições excedido",
+      "internal_error": "Erro interno do servidor",
+      "template_not_found": "Template '{{template}}' não encontrado",
+      "pdf_generation_failed": "Falha na geração do PDF: {{error}}"
+    },
+    "success": {
+      "pdf_generated": "PDF gerado com sucesso",
+      "template_found": "Template encontrado",
+      "data_validated": "Dados validados com sucesso"
+    }
+  },
+  "pdf": {
+    "generation": {
+      "title": "Geração de PDF",
+      "processing": "Gerando PDF...",
+      "success": "PDF gerado com sucesso!",
+      "download_ready": "Download pronto"
+    },
+    "config": {
+      "format": "Formato",
+      "orientation": "Orientação",
+      "margin": "Margem",
+      "quality": "Qualidade"
+    },
+    "formats": {
+      "A4": "A4 (210×297mm)",
+      "A5": "A5 (148×210mm)",
+      "Letter": "Carta (216×279mm)",
+      "Legal": "Legal (216×356mm)"
+    },
+    "orientations": {
+      "portrait": "Retrato",
+      "landscape": "Paisagem"
+    }
+  }
+}

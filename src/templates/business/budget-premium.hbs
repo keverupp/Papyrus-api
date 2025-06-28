@@ -4,8 +4,10 @@ type: budget-premium
 name: Orçamento Premium
 description: Template avançado de orçamento com suporte a logo, marca d'água e design profissional
 tags: orcamento, premium, logo, marca-dagua, profissional, empresarial
-version: 2.0.0
+version: 2.0.1
 author: Papyrus Team
+language: pt-BR
+supportedLanguages: pt-BR
 -->
 <html lang="pt-BR">
   <head>
@@ -112,23 +114,33 @@ author: Papyrus Team
       .markdown-content ul, .markdown-content ol { padding-left: 14px; /*
       Aumentado de 12px */ margin: 5px 0; /* Aumentado de 4px */ }
       .markdown-content li { margin-bottom: 3px; /* Aumentado de 2px */ } /*
-      Rodapé */ .footer { text-align: center; font-size: 7px; /* Aumentado de
-      5px */ color: #bdc3c7; border-top: 1px solid #ecf0f1; padding-top: 10px;
-      /* Aumentado de 8px */ margin-top: 18px; /* Aumentado de 15px */
-      font-weight: 400; } .footer div { margin-bottom: 2px; /* Aumentado de 1px
-      */ } /* Utilitários */ .text-right { text-align: right; } .text-center {
-      text-align: center; } /* Impressão */ @media print { body { font-size:
-      10pt; /* Aumentado de 8pt */ -webkit-print-color-adjust: exact;
-      color-adjust: exact; } .container { padding: 10px; max-width: 100%; }
-      .watermark-logo, .watermark-text { position: absolute; } .client-hero,
-      .content-box { page-break-inside: avoid; } tr, .detail-item {
-      page-break-inside: avoid; } thead { display: table-header-group; }
-      .items-table tbody tr:hover { background-color: transparent; } } /*
-      Responsividade */ @media (max-width: 600px) { .container { padding: 10px;
-      } .company-header { flex-direction: column; gap: 12px; /* Aumentado de
-      10px */ } .budget-meta { text-align: left; } .notes-terms-flex-container {
-      flex-direction: column; gap: 12px; /* Aumentado de 10px */ } .totals-table
-      { width: 60%; } }
+      Rodapé aprimorado */ .footer { border-top: 2px solid #ecf0f1; padding-top:
+      15px; margin-top: 25px; background: linear-gradient(135deg, #f8f9fa 0%,
+      #ffffff 100%); border-radius: 6px; padding: 15px; } .footer-content {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 15px; } .footer-contacts { display: flex;
+      align-items: center; gap: 20px; flex-wrap: wrap; } .contact-item {
+      display: flex; align-items: center; gap: 6px; font-size: 8px; color:
+      #5d6d7e; font-weight: 500; } .contact-icon { width: 12px; height: 12px;
+      fill: #3498db; flex-shrink: 0; } .footer-info { text-align: right;
+      font-size: 7px; color: #95a5a6; line-height: 1.4; } .footer-website {
+      font-size: 8px; color: #3498db; font-weight: 600; text-decoration: none;
+      margin-bottom: 4px; display: block; } /* Utilitários */ .text-right {
+      text-align: right; } .text-center { text-align: center; } /* Impressão */
+      @media print { body { font-size: 10pt; /* Aumentado de 8pt */
+      -webkit-print-color-adjust: exact; color-adjust: exact; } .container {
+      padding: 10px; max-width: 100%; } .watermark-logo, .watermark-text {
+      position: absolute; } .client-hero, .content-box { page-break-inside:
+      avoid; } tr, .detail-item { page-break-inside: avoid; } thead { display:
+      table-header-group; } .items-table tbody tr:hover { background-color:
+      transparent; } .footer { background: transparent; border-top: 1px solid
+      #bdc3c7; } } /* Responsividade */ @media (max-width: 600px) { .container {
+      padding: 10px; } .company-header { flex-direction: column; gap: 12px; /*
+      Aumentado de 10px */ } .budget-meta { text-align: left; }
+      .notes-terms-flex-container { flex-direction: column; gap: 12px; /*
+      Aumentado de 10px */ } .totals-table { width: 60%; } .footer-content {
+      flex-direction: column; text-align: center; gap: 10px; } .footer-info {
+      text-align: center; } }
     </style>
   </head>
   <body>
@@ -286,9 +298,40 @@ author: Papyrus Team
       </section>
 
       <footer class="footer">
-        {{#if budget.company.website}}<div
-          >{{budget.company.website}}</div>{{/if}}
-        <div>Este orçamento foi gerado em {{date "DD/MM/YYYY HH:mm"}}.</div>
+        <div class="footer-content">
+          <div class="footer-contacts">
+            {{#if budget.company.phone}}
+              <div class="contact-item">
+                <svg class="contact-icon" viewBox="0 0 24 24">
+                  <path
+                    d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"
+                  />
+                </svg>
+                <span>{{budget.company.phone}}</span>
+              </div>
+            {{/if}}
+            {{#if budget.company.email}}
+              <div class="contact-item">
+                <svg class="contact-icon" viewBox="0 0 24 24">
+                  <path
+                    d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"
+                  />
+                </svg>
+                <span>{{budget.company.email}}</span>
+              </div>
+            {{/if}}
+          </div>
+
+          <div class="footer-info">
+            {{#if budget.company.website}}
+              <a
+                href="{{budget.company.website}}"
+                class="footer-website"
+              >{{budget.company.website}}</a>
+            {{/if}}
+            <div>Orçamento gerado em {{date "DD/MM/YYYY HH:mm"}}</div>
+          </div>
+        </div>
       </footer>
     </div>
   </body>

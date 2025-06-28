@@ -1,0 +1,182 @@
+{
+  "language": {
+    "code": "en-US",
+    "name": "English (United States)",
+    "flag": "🇺🇸"
+  },
+  "categories": {
+    "basic": "Basic",
+    "educational": "Educational",
+    "business": "Business",
+    "medical": "Medical",
+    "general": "General"
+  },
+  "templates": {
+    "blank": {
+      "name": "Blank Page",
+      "description": "Basic document without specific formatting, ideal for custom content",
+      "tags": ["basic", "simple", "custom", "document"]
+    },
+    "logo": {
+      "name": "With Logo",
+      "description": "Document with space for logo in header",
+      "tags": ["logo", "brand", "header", "business"]
+    },
+    "watermark": {
+      "name": "With Watermark",
+      "description": "Document with custom watermark",
+      "tags": ["watermark", "security", "confidential"]
+    },
+    "exam": {
+      "name": "Exam/Test",
+      "description": "Complete template for exams and tests with multiple question types",
+      "tags": ["exam", "test", "educational", "school", "questions"]
+    },
+    "assessment": {
+      "name": "Universal Assessment",
+      "description": "Flexible template for academic, business and professional assessments",
+      "tags": ["assessment", "academic", "business", "universal"]
+    },
+    "quiz": {
+      "name": "Interactive Quiz",
+      "description": "Modern questionnaire with support for multiple choice, true/false and essay questions",
+      "tags": [
+        "quiz",
+        "questionnaire",
+        "interactive",
+        "educational",
+        "assessment"
+      ]
+    },
+    "budget": {
+      "name": "Business Budget",
+      "description": "Basic template for budgets with automatic totals and tax calculations",
+      "tags": ["budget", "business", "financial", "proposal", "basic"]
+    },
+    "budget-premium": {
+      "name": "Premium Budget",
+      "description": "Advanced budget template with logo, watermark and professional design support",
+      "tags": [
+        "budget",
+        "premium",
+        "logo",
+        "watermark",
+        "professional",
+        "business"
+      ]
+    },
+    "report": {
+      "name": "Executive Report",
+      "description": "Professional template for business reports",
+      "tags": ["report", "executive", "business", "analysis"]
+    },
+    "invoice": {
+      "name": "Invoice/Bill",
+      "description": "Template for invoices and bills",
+      "tags": ["invoice", "bill", "billing", "financial"]
+    },
+    "anamnesis": {
+      "name": "Medical History Form",
+      "description": "Professional template for medical forms with required fields",
+      "tags": ["anamnesis", "medical", "form", "health", "patient"]
+    },
+    "prescription": {
+      "name": "Medical Prescription",
+      "description": "Professional template for medical prescriptions with required fields and standardized layout",
+      "tags": ["prescription", "medical", "medication", "health"]
+    },
+    "clinical_form": {
+      "name": "Clinical Form",
+      "description": "Template for general clinical forms",
+      "tags": ["form", "clinical", "medical", "health"]
+    }
+  },
+  "common": {
+    "fields": {
+      "name": "Name",
+      "title": "Title",
+      "description": "Description",
+      "date": "Date",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "document": "Document",
+      "company": "Company",
+      "client": "Client",
+      "total": "Total",
+      "subtotal": "Subtotal",
+      "quantity": "Quantity",
+      "price": "Price",
+      "discount": "Discount",
+      "tax": "Tax"
+    },
+    "actions": {
+      "generate": "Generate",
+      "download": "Download",
+      "preview": "Preview",
+      "cancel": "Cancel",
+      "save": "Save",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "messages": {
+      "success": "Success!",
+      "error": "Error!",
+      "loading": "Loading...",
+      "not_found": "Not found",
+      "invalid_data": "Invalid data",
+      "processing": "Processing...",
+      "completed": "Completed!",
+      "failed": "Failed!"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "completed": "Completed",
+      "failed": "Failed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "api": {
+    "errors": {
+      "unauthorized": "Unauthorized - API key required",
+      "forbidden": "Access denied",
+      "not_found": "Resource not found",
+      "validation_error": "Data validation error",
+      "rate_limit": "Request limit exceeded",
+      "internal_error": "Internal server error",
+      "template_not_found": "Template '{{template}}' not found",
+      "pdf_generation_failed": "PDF generation failed: {{error}}"
+    },
+    "success": {
+      "pdf_generated": "PDF generated successfully",
+      "template_found": "Template found",
+      "data_validated": "Data validated successfully"
+    }
+  },
+  "pdf": {
+    "generation": {
+      "title": "PDF Generation",
+      "processing": "Generating PDF...",
+      "success": "PDF generated successfully!",
+      "download_ready": "Download ready"
+    },
+    "config": {
+      "format": "Format",
+      "orientation": "Orientation",
+      "margin": "Margin",
+      "quality": "Quality"
+    },
+    "formats": {
+      "A4": "A4 (210×297mm)",
+      "A5": "A5 (148×210mm)",
+      "Letter": "Letter (216×279mm)",
+      "Legal": "Legal (216×356mm)"
+    },
+    "orientations": {
+      "portrait": "Portrait",
+      "landscape": "Landscape"
+    }
+  }
+}

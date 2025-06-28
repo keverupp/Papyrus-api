@@ -1,0 +1,280 @@
+<!--
+TEMPLATE_META
+type: budget-premium
+name: Premium Budget
+description: Advanced budget template with logo, watermark and professional design support
+tags: budget, premium, logo, watermark, professional, business
+version: 2.0.0
+author: Papyrus Team
+language: en-US
+supportedLanguages: en-US, pt-BR
+-->
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{title}}</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; } body { font-family:
+      'Segoe UI', 'Helvetica Neue', 'Arial', sans-serif; font-size: 9px;
+      line-height: 1.4; color: #2c3e50; background: #fff; letter-spacing:
+      0.02em; } .container { width: 100%; max-width: 800px; margin: 0 auto;
+      padding: 15px; position: relative; z-index: 1; } /* Watermark */
+      .watermark-logo { position: fixed; top: 0; left: 0; width: 100vw; height:
+      100vh; z-index: 0; opacity:
+      {{watermark.logo.opacity}}; pointer-events: none; background-image: url('{{watermark.logo.url}}');
+      background-repeat: no-repeat; background-position: center center;
+      background-size: contain; } .watermark-text { position: fixed; top: 50%;
+      left: 50%; transform: translate(-50%, -50%) rotate({{watermark.rotation}}deg);
+      z-index: 0; opacity:
+      {{watermark.opacity}}; pointer-events: none; font-size:
+      {{watermark.fontSize}}; font-weight: 300; color: #bdc3c7; text-transform:
+      uppercase; white-space: nowrap; font-family: 'Segoe UI', Arial,
+      sans-serif; letter-spacing: 3px; } /* Company header */ .company-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      padding-bottom: 12px; border-bottom: 2px solid #34495e; margin-bottom:
+      18px; } .company-logo-and-name { display: flex; align-items: center; gap:
+      12px; } .company-logo { max-height: 50px; max-width: 150px; object-fit:
+      contain; } .company-name h1 { font-size: 14px; font-weight: 600; color:
+      #2c3e50; margin-bottom: 3px; letter-spacing: 0.5px; } .company-name
+      .company-details { font-size: 8px; color: #7f8c8d; font-weight: 400;
+      line-height: 1.5; } /* Proposal meta */ .budget-meta { text-align: right;
+      font-size: 8px; color: #7f8c8d; } .budget-meta .budget-number { font-size:
+      12px; font-weight: 700; color: #2c3e50; margin-bottom: 4px;
+      letter-spacing: 0.3px; } .budget-meta div { margin-bottom: 2px; }
+      .budget-meta strong { font-weight: 600; color: #34495e; } /* Client data
+      */ .client-hero { background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1
+      100%); border: 1px solid #d5dbdb; padding: 12px; margin-bottom: 18px;
+      border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); } .client-hero
+      h2 { font-size: 10px; font-weight: 600; color: #2c3e50; margin-bottom:
+      8px; text-transform: uppercase; letter-spacing: 0.5px; } .client-details {
+      display: grid; grid-template-columns: 1fr; gap: 5px; } .detail-item {
+      font-size: 9px; line-height: 1.5; } .detail-item .detail-label {
+      font-weight: 600; font-size: 8px; color: #7f8c8d; text-transform:
+      uppercase; letter-spacing: 0.3px; margin-right: 5px; } .detail-item
+      span:not(.detail-label) { color: #2c3e50; font-weight: 500; } /* Items
+      table */ .items-table { width: 100%; border-collapse: collapse; margin:
+      18px 0; border-radius: 4px; overflow: hidden; box-shadow: 0 2px 4px
+      rgba(0,0,0,0.08); table-layout: fixed; } .items-table th { background:
+      #34495e; color: white; padding: 8px 10px; font-size: 8px; font-weight:
+      600; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px
+      solid #1a252f; } .items-table th:nth-child(1) { text-align: left; width:
+      45%; } .items-table th:nth-child(2) { text-align: center; width: 10%; }
+      .items-table th:nth-child(3) { text-align: right; width: 22.5%; }
+      .items-table th:nth-child(4) { text-align: right; width: 22.5%; }
+      .items-table td { padding: 8px 10px; border-bottom: 1px solid #ecf0f1;
+      vertical-align: top; font-size: 9px; transition: background-color 0.2s
+      ease; } .items-table td:nth-child(1) { text-align: left; } .items-table
+      td:nth-child(2) { text-align: center; } .items-table td:nth-child(3) {
+      text-align: right; } .items-table td:nth-child(4) { text-align: right; }
+      .items-table .item-description { font-weight: 600; color: #2c3e50;
+      font-size: 10px; margin-bottom: 3px; } .items-table .item-details {
+      font-size: 8px; color: #95a5a6; line-height: 1.4; font-style: italic; }
+      .items-table td strong { font-size: 10px; font-weight: 700; color:
+      #27ae60; } /* Zebra stripes */ .items-table tbody tr:nth-child(odd) {
+      background-color: #fafbfc; } .items-table tbody tr:nth-child(even) {
+      background-color: #ffffff; } .items-table tbody tr:hover {
+      background-color: #f1f2f6; } /* Totals */ .totals-section { display: flex;
+      justify-content: flex-end; margin-top: 12px; } .totals-table { width: 40%;
+      max-width: 280px; border-radius: 4px; overflow: hidden; box-shadow: 0 2px
+      4px rgba(0,0,0,0.08); } .totals-table td { padding: 6px 10px;
+      border-bottom: 1px solid #ecf0f1; font-size: 9px; font-weight: 500; }
+      .totals-table td:first-child { color: #7f8c8d; font-weight: 600; }
+      .totals-table td:last-child { color: #2c3e50; font-weight: 600; }
+      .totals-table tr.total-row td { background: linear-gradient(135deg,
+      #27ae60 0%, #2ecc71 100%); border-radius: 4px; color: white; font-weight:
+      700; font-size: 11px; padding: 10px; border: none; text-shadow: 0 1px 2px
+      rgba(0,0,0,0.2); } /* Notes and terms */ .notes-terms-section {
+      padding-top: 18px; border-top: 1px solid #ecf0f1; margin-top: 18px; }
+      .notes-terms-flex-container { display: flex; justify-content:
+      space-between; align-items: flex-start; gap: 18px; } .content-box { flex:
+      1; min-width: 0; background: #fafbfc; padding: 10px; border-radius: 4px;
+      border-left: 3px solid #3498db; } .content-box h4 { font-size: 9px;
+      font-weight: 600; color: #2c3e50; margin-bottom: 8px; text-transform:
+      uppercase; letter-spacing: 0.5px; } .markdown-content { font-size: 8px;
+      color: #5d6d7e; line-height: 1.5; font-weight: 400; } .markdown-content p
+      { margin: 0 0 5px 0; } .markdown-content strong { color: #2c3e50;
+      font-weight: 600; } .markdown-content ul, .markdown-content ol {
+      padding-left: 14px; margin: 5px 0; } .markdown-content li { margin-bottom:
+      3px; } /* Footer */ .footer { text-align: center; font-size: 7px; color:
+      #bdc3c7; border-top: 1px solid #ecf0f1; padding-top: 10px; margin-top:
+      18px; font-weight: 400; } .footer div { margin-bottom: 2px; } /* Print
+      styles */ @media print { body { font-size: 10pt;
+      -webkit-print-color-adjust: exact; color-adjust: exact; } .container {
+      padding: 10px; max-width: 100%; } .watermark-logo, .watermark-text {
+      position: absolute; } .client-hero, .content-box { page-break-inside:
+      avoid; } tr, .detail-item { page-break-inside: avoid; } thead { display:
+      table-header-group; } .items-table tbody tr:hover { background-color:
+      transparent; } } /* Responsive */ @media (max-width: 600px) { .container {
+      padding: 10px; } .company-header { flex-direction: column; gap: 12px; }
+      .budget-meta { text-align: left; } .notes-terms-flex-container {
+      flex-direction: column; gap: 12px; } .totals-table { width: 60%; } }
+    </style>
+  </head>
+  <body>
+    <!-- Watermark - Logo or Text -->
+    {{#if watermark}}
+      {{#ifCond watermark.type "===" "logo"}}
+        <img
+          src="{{watermark.logo.url}}"
+          class="watermark-logo"
+          alt="Watermark"
+        />
+      {{else}}
+        <div class="watermark-text">{{watermark.text}}</div>
+      {{/ifCond}}
+    {{/if}}
+
+    <div class="container">
+      <header class="company-header">
+        <div class="company-logo-and-name">
+          {{#if logo.url}}
+            <img src="{{logo.url}}" alt="Logo" class="company-logo" />
+          {{/if}}
+          <div class="company-name">
+            <h1>{{budget.company.name}}</h1>
+            <div class="company-details">
+              {{#if budget.company.cnpj}}Tax ID: {{budget.company.cnpj}}{{/if}}
+              {{#if budget.company.address}} | {{budget.company.address}}{{/if}}
+            </div>
+          </div>
+        </div>
+        <div class="budget-meta">
+          <div class="budget-number">{{#if budget.number}}Proposal No.
+              {{budget.number}}{{else}}{{title}}{{/if}}</div>
+          <div><strong>Date:</strong> {{date "MM/DD/YYYY"}}</div>
+          {{#if budget.validUntil}}
+            <div><strong>Valid until:</strong>
+              {{date budget.validUntil "MM/DD/YYYY"}}</div>
+          {{/if}}
+        </div>
+      </header>
+
+      {{#if budget.client}}
+        <section class="client-hero">
+          <h2>Client Information</h2>
+          <div class="client-details">
+            <div class="detail-item">
+              <span class="detail-label">Client:</span>
+              <span>{{budget.client.name}}</span>
+            </div>
+            {{#if budget.client.document}}
+              <div class="detail-item">
+                <span class="detail-label">{{#ifCond
+                    budget.client.document.length ">" 14
+                  }}Tax ID{{else}}ID{{/ifCond}}:</span>
+                <span>{{budget.client.document}}</span>
+              </div>
+            {{/if}}
+            {{#if budget.client.email}}
+              <div class="detail-item">
+                <span class="detail-label">Email:</span>
+                <span>{{budget.client.email}}</span>
+              </div>
+            {{/if}}
+            {{#if budget.client.phone}}
+              <div class="detail-item">
+                <span class="detail-label">Phone:</span>
+                <span>{{budget.client.phone}}</span>
+              </div>
+            {{/if}}
+          </div>
+        </section>
+      {{/if}}
+
+      {{#if budget.items}}
+        <table class="items-table">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Qty</th>
+              <th>Unit Price</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each budget.items}}
+              <tr>
+                <td>
+                  <div class="item-description">{{description}}</div>
+                  {{#if details}}<div
+                      class="item-details"
+                    >{{details}}</div>{{/if}}
+                </td>
+                <td>{{number quantity 0}}</td>
+                <td>${{number unitPrice 2}}</td>
+                <td><strong>${{number total 2}}</strong></td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      {{/if}}
+
+      <section class="totals-section">
+        <table class="totals-table">
+          <tbody>
+            <tr>
+              <td>Subtotal:</td>
+              <td class="text-right">${{number
+                  budget.calculations.subtotal
+                  2
+                }}</td>
+            </tr>
+            {{#if budget.calculations.discountAmount}}
+              {{#ifCond budget.calculations.discountAmount ">" 0}}
+                <tr>
+                  <td>Discount:</td>
+                  <td class="text-right">-${{number
+                      budget.calculations.discountAmount
+                      2
+                    }}</td>
+                </tr>
+              {{/ifCond}}
+            {{/if}}
+            {{#if budget.calculations.taxAmount}}
+              {{#ifCond budget.calculations.taxAmount ">" 0}}
+                <tr>
+                  <td>Tax ({{number budget.calculations.taxRate 1}}%):</td>
+                  <td class="text-right">${{number
+                      budget.calculations.taxAmount
+                      2
+                    }}</td>
+                </tr>
+              {{/ifCond}}
+            {{/if}}
+            <tr class="total-row">
+              <td><strong>TOTAL AMOUNT:</strong></td>
+              <td class="text-right"><strong>${{number
+                    budget.calculations.total
+                    2
+                  }}</strong></td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="notes-terms-section">
+        <div class="notes-terms-flex-container">
+          {{#if budget.notes}}
+            <div class="content-box">
+              <h4>Notes</h4>
+              <div class="markdown-content">{{{budget.notes}}}</div>
+            </div>
+          {{/if}}
+          {{#if budget.terms}}
+            <div class="content-box">
+              <h4>Terms and Conditions</h4>
+              <div class="markdown-content">{{{budget.terms}}}</div>
+            </div>
+          {{/if}}
+        </div>
+      </section>
+
+      <footer class="footer">
+        {{#if budget.company.website}}<div
+          >{{budget.company.website}}</div>{{/if}}
+        <div>This proposal was generated on {{date "MM/DD/YYYY HH:mm"}}.</div>
+      </footer>
+    </div>
+  </body>
+</html>

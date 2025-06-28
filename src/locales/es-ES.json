@@ -1,0 +1,182 @@
+{
+  "language": {
+    "code": "es-ES",
+    "name": "Español (España)",
+    "flag": "🇪🇸"
+  },
+  "categories": {
+    "basic": "Básicos",
+    "educational": "Educativos",
+    "business": "Empresariales",
+    "medical": "Médicos",
+    "general": "Generales"
+  },
+  "templates": {
+    "blank": {
+      "name": "Página en Blanco",
+      "description": "Documento básico sin formato específico, ideal para contenido personalizado",
+      "tags": ["básico", "simple", "personalizado", "documento"]
+    },
+    "logo": {
+      "name": "Con Logotipo",
+      "description": "Documento con espacio para logotipo en el encabezado",
+      "tags": ["logo", "marca", "encabezado", "empresarial"]
+    },
+    "watermark": {
+      "name": "Con Marca de Agua",
+      "description": "Documento con marca de agua personalizada",
+      "tags": ["marca-de-agua", "seguridad", "confidencial"]
+    },
+    "exam": {
+      "name": "Examen/Prueba",
+      "description": "Plantilla completa para exámenes y pruebas con múltiples tipos de preguntas",
+      "tags": ["examen", "prueba", "educativo", "escuela", "preguntas"]
+    },
+    "assessment": {
+      "name": "Evaluación Universal",
+      "description": "Plantilla flexible para evaluaciones académicas, empresariales y profesionales",
+      "tags": ["evaluación", "académico", "empresarial", "universal"]
+    },
+    "quiz": {
+      "name": "Cuestionario Interactivo",
+      "description": "Cuestionario moderno con soporte para opción múltiple, verdadero/falso y ensayos",
+      "tags": ["quiz", "cuestionario", "interactivo", "educativo", "evaluación"]
+    },
+    "budget": {
+      "name": "Presupuesto Empresarial",
+      "description": "Plantilla básica para presupuestos con cálculos automáticos de totales e impuestos",
+      "tags": [
+        "presupuesto",
+        "empresarial",
+        "financiero",
+        "propuesta",
+        "básico"
+      ]
+    },
+    "budget-premium": {
+      "name": "Presupuesto Premium",
+      "description": "Plantilla avanzada de presupuesto con soporte para logo, marca de agua y diseño profesional",
+      "tags": [
+        "presupuesto",
+        "premium",
+        "logo",
+        "marca-de-agua",
+        "profesional",
+        "empresarial"
+      ]
+    },
+    "report": {
+      "name": "Informe Ejecutivo",
+      "description": "Plantilla profesional para informes empresariales",
+      "tags": ["informe", "ejecutivo", "empresarial", "análisis"]
+    },
+    "invoice": {
+      "name": "Factura",
+      "description": "Plantilla para facturas y recibos",
+      "tags": ["factura", "recibo", "facturación", "financiero"]
+    },
+    "anamnesis": {
+      "name": "Ficha de Anamnesis",
+      "description": "Plantilla profesional para fichas médicas con campos obligatorios",
+      "tags": ["anamnesis", "médico", "ficha", "salud", "paciente"]
+    },
+    "prescription": {
+      "name": "Receta Médica",
+      "description": "Plantilla profesional para recetas médicas con campos obligatorios y diseño estandarizado",
+      "tags": ["receta", "médica", "medicamento", "prescripción", "salud"]
+    },
+    "clinical_form": {
+      "name": "Formulario Clínico",
+      "description": "Plantilla para formularios clínicos generales",
+      "tags": ["formulario", "clínico", "médico", "salud"]
+    }
+  },
+  "common": {
+    "fields": {
+      "name": "Nombre",
+      "title": "Título",
+      "description": "Descripción",
+      "date": "Fecha",
+      "email": "Correo electrónico",
+      "phone": "Teléfono",
+      "address": "Dirección",
+      "document": "Documento",
+      "company": "Empresa",
+      "client": "Cliente",
+      "total": "Total",
+      "subtotal": "Subtotal",
+      "quantity": "Cantidad",
+      "price": "Precio",
+      "discount": "Descuento",
+      "tax": "Impuesto"
+    },
+    "actions": {
+      "generate": "Generar",
+      "download": "Descargar",
+      "preview": "Vista previa",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    },
+    "messages": {
+      "success": "¡Éxito!",
+      "error": "¡Error!",
+      "loading": "Cargando...",
+      "not_found": "No encontrado",
+      "invalid_data": "Datos inválidos",
+      "processing": "Procesando...",
+      "completed": "¡Completado!",
+      "failed": "¡Falló!"
+    },
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "pending": "Pendiente",
+      "completed": "Completado",
+      "failed": "Falló",
+      "cancelled": "Cancelado"
+    }
+  },
+  "api": {
+    "errors": {
+      "unauthorized": "No autorizado - API key requerida",
+      "forbidden": "Acceso denegado",
+      "not_found": "Recurso no encontrado",
+      "validation_error": "Error de validación de datos",
+      "rate_limit": "Límite de solicitudes excedido",
+      "internal_error": "Error interno del servidor",
+      "template_not_found": "Plantilla '{{template}}' no encontrada",
+      "pdf_generation_failed": "Fallo en la generación del PDF: {{error}}"
+    },
+    "success": {
+      "pdf_generated": "PDF generado exitosamente",
+      "template_found": "Plantilla encontrada",
+      "data_validated": "Datos validados exitosamente"
+    }
+  },
+  "pdf": {
+    "generation": {
+      "title": "Generación de PDF",
+      "processing": "Generando PDF...",
+      "success": "¡PDF generado exitosamente!",
+      "download_ready": "Descarga lista"
+    },
+    "config": {
+      "format": "Formato",
+      "orientation": "Orientación",
+      "margin": "Margen",
+      "quality": "Calidad"
+    },
+    "formats": {
+      "A4": "A4 (210×297mm)",
+      "A5": "A5 (148×210mm)",
+      "Letter": "Carta (216×279mm)",
+      "Legal": "Legal (216×356mm)"
+    },
+    "orientations": {
+      "portrait": "Vertical",
+      "landscape": "Horizontal"
+    }
+  }
+}

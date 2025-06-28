@@ -49,16 +49,71 @@ module.exports = fp(
         return `ip:${request.ip}:${fingerprint}`;
       },
 
-      // Resposta de erro rica e informativa
-      errorResponseBuilder: (request, context) => {
+      // Resposta de erro rica e informativa com suporte a i18n
+      errorResponseBuilder: async (request, context) => {
         const resetTime = new Date(Date.now() + context.ttl);
         const resetTimeFormatted = resetTime.toISOString();
+
+        // Detecta idioma da requisição
+        const language =
+          request.body?.language ||
+          request.query?.lang ||
+          request.headers["accept-language"]?.split(",")[0]?.split("-")[0] ===
+            "en"
+            ? "en-US"
+            : request.headers["accept-language"]
+                ?.split(",")[0]
+                ?.split("-")[0] === "es"
+            ? "es-ES"
+            : "pt-BR";
+
+        let translations = {};
+        try {
+          // Tenta carregar traduções se o serviço estiver disponível
+          if (app.i18nService) {
+            translations = await app.i18nService.getTranslations(language);
+          }
+        } catch (error) {
+          app.log.warn("Erro ao carregar traduções para rate limit:", error);
+        }
+
+        // Mensagens padrão por idioma (fallback)
+        const defaultMessages = {
+          "pt-BR": {
+            main: "Limite de requisições excedido. Tente novamente em alguns segundos.",
+            suggestion_basic:
+              "Considere fazer upgrade para uma API key premium para maior limite.",
+            suggestion_other: "Distribua suas requisições ao longo do tempo.",
+            suggestion_no_key:
+              "Use uma API key válida para ter maior limite de requisições.",
+          },
+          "en-US": {
+            main: "Request limit exceeded. Please try again in a few seconds.",
+            suggestion_basic:
+              "Consider upgrading to a premium API key for higher limits.",
+            suggestion_other: "Distribute your requests over time.",
+            suggestion_no_key:
+              "Use a valid API key to get higher request limits.",
+          },
+          "es-ES": {
+            main: "Límite de solicitudes excedido. Inténtelo de nuevo en unos segundos.",
+            suggestion_basic:
+              "Considere actualizar a una API key premium para límites más altos.",
+            suggestion_other:
+              "Distribuya sus solicitudes a lo largo del tiempo.",
+            suggestion_no_key:
+              "Use una API key válida para obtener límites de solicitud más altos.",
+          },
+        };
+
+        const messages = defaultMessages[language] || defaultMessages["pt-BR"];
+        const apiMessages = translations.api?.errors || {};
 
         const baseResponse = {
           statusCode: 429,
           error: "Too Many Requests",
-          message:
-            "Limite de requisições excedido. Tente novamente em alguns segundos.",
+          message: apiMessages.rate_limit || messages.main,
+          language,
           rateLimit: {
             max: context.max,
             remaining: 0,
@@ -77,11 +132,10 @@ module.exports = fp(
 
           baseResponse.suggestion =
             request.apiKey.type === "basic"
-              ? "Considere fazer upgrade para uma API key premium para maior limite."
-              : "Distribua suas requisições ao longo do tempo.";
+              ? messages.suggestion_basic
+              : messages.suggestion_other;
         } else {
-          baseResponse.suggestion =
-            "Use uma API key válida para ter maior limite de requisições.";
+          baseResponse.suggestion = messages.suggestion_no_key;
         }
 
         // Log do rate limit atingido
@@ -91,6 +145,7 @@ module.exports = fp(
           url: request.url,
           limit: context.max,
           hits: context.totalHits,
+          language,
         });
 
         return baseResponse;
@@ -104,7 +159,7 @@ module.exports = fp(
         }
 
         // Pula para rotas públicas específicas
-        const publicRoutes = ["/health"];
+        const publicRoutes = ["/health", "/pdf/languages"];
         if (publicRoutes.some((route) => request.url.startsWith(route))) {
           return true;
         }
@@ -177,13 +232,14 @@ module.exports = fp(
       }
     });
 
-    app.log.info("🛡️ Rate limiting configurado", {
+    app.log.info("🛡️ Rate limiting configurado com suporte a i18n", {
       defaultLimit: config.rateLimit?.default || 5,
       window: `${(config.rateLimit?.window || 60000) / 1000}s`,
+      supportedLanguages: ["pt-BR", "en-US", "es-ES"],
     });
   },
   {
     name: "rate-limit",
-    dependencies: ["config"], // Só depende das configurações por enquanto
+    dependencies: ["config"], // i18n-service é opcional
   }
 );
