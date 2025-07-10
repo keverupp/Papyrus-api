@@ -10,48 +10,25 @@ services:
         NODE_VERSION: ${NODE_VERSION:-18-alpine}
     container_name: papyrus-api
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
+      # Sobrescreve apenas se necessário (o .env já tem tudo)
       NODE_ENV: ${NODE_ENV:-production}
       PORT: ${PORT:-4000}
       HOST: ${HOST:-0.0.0.0}
-      
-      DB_CLIENT: ${DB_CLIENT:-pg}
-      DB_HOST: ${DB_HOST:-postgres-shared}
-      DB_PORT: ${DB_PORT:-5432}
-      DB_USER: ${DB_USER:-papyrus_user}
-      DB_PASSWORD: ${DB_PASSWORD:-papyrus_secure_2024}
-      DB_DATABASE: ${DB_DATABASE:-papyrus_db}
-
-      ADMIN_API_KEYS: ${ADMIN_API_KEYS:-demo-key:10,premium-key:100,unlimited-key:0}
-
-      RATE_LIMIT_DEFAULT: ${RATE_LIMIT_DEFAULT:-10}
-      RATE_LIMIT_WINDOW: ${RATE_LIMIT_WINDOW:-60000}
-
-      PDF_ENGINE: ${PDF_ENGINE:-puppeteer}
-      PDF_TIMEOUT: ${PDF_TIMEOUT:-30000}
-      PDF_QUALITY: ${PDF_QUALITY:-high}
-
-      CORS_ORIGIN: ${CORS_ORIGIN:-*}
-      HELMET_ENABLED: ${HELMET_ENABLED:-true}
-      JWT_SECRET: ${JWT_SECRET:-your_super_secret_jwt_key_here_change_in_production}
-
-      ENABLE_COMPRESSION: ${ENABLE_COMPRESSION:-true}
-      CACHE_TEMPLATES: ${CACHE_TEMPLATES:-true}
-      CACHE_DURATION: ${CACHE_DURATION:-30000}
-      LOG_LEVEL: ${LOG_LEVEL:-info}
-      LOG_TO_FILE: ${LOG_TO_FILE:-false}
       
     volumes:
       - papyrus_pdf_cache:/app/cache
       - papyrus_logs:/app/logs
       - papyrus_uploads:/app/uploads
+      - papyrus_templates:/app/custom-templates
 
     ports:
       - "${PAPYRUS_API_PORT:-4000}:4000"
 
     networks:
-      - papyrus-internal
-      - shared-database-network
+      - papyrus-network
       
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4000/health"]
@@ -74,28 +51,25 @@ services:
         reservations:
           memory: 512M
           cpus: '0.25'
+    
+    # Labels para Portainer webhook
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
+      - "portainer.webhook=true"
+      - "papyrus.version=${PAPYRUS_VERSION:-latest}"
 
-  # ========== REDIS PARA CACHE ==========
-  papyrus-redis:
-    image: redis:7-alpine
-    container_name: papyrus-redis
-    restart: unless-stopped
-    command: redis-server --appendonly yes --requirepass ${PAPYRUS_REDIS_PASSWORD:-papyrus_redis_2024}
-    volumes:
-      - papyrus_redis_data:/data
-    ports:
-      - "${PAPYRUS_REDIS_PORT:-6379}:6379"
-    networks:
-      - papyrus-internal
-    healthcheck:
-      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-    profiles:
-      - redis
+# ========== VOLUMES ==========
+volumes:
+  papyrus_pdf_cache:
+    driver: local
+  papyrus_logs:
+    driver: local
+  papyrus_uploads:
+    driver: local
+  papyrus_templates:
+    driver: local
+
+# ========== NETWORKS ==========
+networks:
+  papyrus-network:
+    driver: bridge
