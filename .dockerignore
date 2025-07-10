@@ -1,0 +1,110 @@
+# ========== ARQUIVOS A IGNORAR NO BUILD ==========
+
+# Node modules (será instalado no container)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Arquivos de desenvolvimento
+.env*
+!.env.example
+*.log
+logs/
+coverage/
+.coverage
+.nyc_output
+
+# Arquivos temporários
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Cache e build artifacts
+.cache/
+dist/
+build/
+*.tgz
+*.tar.gz
+
+# Editor e IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# Documentation
+README*.md
+CHANGELOG.md
+LICENSE
+docs/
+*.md
+
+# Tests
+test/
+tests/
+spec/
+__tests__/
+*.test.js
+*.spec.js
+jest.config.js
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+.circleci/
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+migrations/
+seeds/
+backups/
+
+# Uploads e cache local
+uploads/
+cache/
+storage/
+
+# Arquivos específicos do projeto
+postgres-stack/
+nginx/
+scripts/
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Optional npm cache directory
+.npm/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache/
+.parcel-cache/
