@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # ========== API PAPYRUS ==========
   papyrus-api:
     build:
       context: .
@@ -10,12 +9,43 @@ services:
         NODE_VERSION: ${NODE_VERSION:-18-alpine}
     container_name: papyrus-api
     restart: unless-stopped
+
     environment:
-      # Sobrescreve apenas se necessário (o .env já tem tudo)
-      NODE_ENV: ${NODE_ENV:-production}
+      # 🌐 Servidor
       PORT: ${PORT:-4000}
       HOST: ${HOST:-0.0.0.0}
-      
+      NODE_ENV: ${NODE_ENV:-production}
+
+      # 💾 Banco de dados PostgreSQL
+      DB_CLIENT: ${DB_CLIENT}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE: ${DB_DATABASE}
+
+      # 🔑 API Keys Administrativas
+      ADMIN_API_KEYS: ${ADMIN_API_KEYS}
+
+      # ⚙️ Rate Limiting
+      RATE_LIMIT_DEFAULT: ${RATE_LIMIT_DEFAULT}
+      RATE_LIMIT_WINDOW: ${RATE_LIMIT_WINDOW}
+
+      # 🎨 PDF Generation
+      PDF_ENGINE: ${PDF_ENGINE}
+      PDF_TIMEOUT: ${PDF_TIMEOUT}
+      PDF_QUALITY: ${PDF_QUALITY}
+
+      # 🔒 Security
+      CORS_ORIGIN: ${CORS_ORIGIN}
+      HELMET_ENABLED: ${HELMET_ENABLED}
+      JWT_SECRET: ${JWT_SECRET}
+
+      # 📈 Performance
+      ENABLE_COMPRESSION: ${ENABLE_COMPRESSION}
+      CACHE_TEMPLATES: ${CACHE_TEMPLATES}
+      CACHE_DURATION: ${CACHE_DURATION}
+
     volumes:
       - papyrus_pdf_cache:/app/cache
       - papyrus_logs:/app/logs
@@ -23,24 +53,24 @@ services:
       - papyrus_templates:/app/custom-templates
 
     ports:
-      - "${PAPYRUS_API_PORT:-4000}:4000"
+      - "${PORT:-4000}:4000"
 
     networks:
       - papyrus-network
-      
+
     healthcheck:
       test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 60s
-      
+
     logging:
       driver: "json-file"
       options:
         max-size: "50m"
         max-file: "5"
-        
+
     deploy:
       resources:
         limits:
@@ -49,14 +79,12 @@ services:
         reservations:
           memory: 512M
           cpus: '0.25'
-    
-    # Labels para Portainer webhook
+
     labels:
       - "com.centurylinklabs.watchtower.enable=true"
       - "portainer.webhook=true"
       - "papyrus.version=${PAPYRUS_VERSION:-latest}"
 
-# ========== VOLUMES ==========
 volumes:
   papyrus_pdf_cache:
     driver: local
@@ -67,7 +95,6 @@ volumes:
   papyrus_templates:
     driver: local
 
-# ========== NETWORKS ==========
 networks:
   papyrus-network:
     driver: bridge
