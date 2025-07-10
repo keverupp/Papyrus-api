@@ -22,7 +22,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instala apenas dependências de produção
-RUN npm ci --only=production && \
+RUN npm install --only=production && \
     npm cache clean --force
 
 # ===========================================
