@@ -64,6 +64,16 @@ module.exports = fp(
         compression: process.env.ENABLE_COMPRESSION !== "false",
       },
 
+      // Storage (S3/MinIO)
+      storage: {
+        endpoint: process.env.S3_ENDPOINT || "http://localhost:9000",
+        region: process.env.S3_REGION || "us-east-1",
+        bucket: process.env.S3_BUCKET || "papyrus",
+        accessKey: process.env.S3_ACCESS_KEY || "",
+        secretKey: process.env.S3_SECRET_KEY || "",
+        publicUrl: process.env.S3_PUBLIC_URL || "",
+      },
+
       // API Keys administrativas (para seeds/bootstrap)
       adminKeys: process.env.ADMIN_API_KEYS
         ? process.env.ADMIN_API_KEYS.split(",").map((keyPair) => {
@@ -97,6 +107,7 @@ module.exports = fp(
       pdfEngine: config.pdf.engine,
       cacheEnabled: config.cache.templates,
       compressionEnabled: config.performance.compression,
+      storageEndpoint: config.storage.endpoint,
     });
   },
   {
@@ -121,6 +132,10 @@ function validateConfig(config, app) {
 
   if (config.pdf.timeout < 5000) {
     errors.push("⚠️ PDF_TIMEOUT muito baixo, recomendado >= 5000ms");
+  }
+
+  if (!config.storage.bucket) {
+    errors.push("❌ S3_BUCKET é obrigatório");
   }
 
   // Log de erros ou warnings
