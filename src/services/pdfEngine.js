@@ -91,8 +91,12 @@ module.exports = fp(
         // Aplica estilos de marca d'água se necessário
         await applyWatermarkStyles(page, userConfig.watermark);
 
-        // Aguarda renderização completa (método atualizado)
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        // Aguarda carregamento de fontes sem delay fixo
+        await page.evaluate(async () => {
+          if (document.fonts && document.fonts.ready) {
+            await document.fonts.ready;
+          }
+        });
 
         // Log das configurações aplicadas
         app.log.info("📋 Configurações de PDF aplicadas:", {

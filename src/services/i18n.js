@@ -241,6 +241,8 @@ module.exports = fp(
       };
     }
 
+    // Pré-carrega traduções padrão para agilizar primeira requisição
+    await getTranslations();
     app.log.info("🌍 Serviço de i18n registrado");
   },
   {
