@@ -9,7 +9,8 @@ module.exports = fp(
     // Cache dos templates para evitar re-scan constante
     let templatesCache = null;
     let lastScanTime = 0;
-    const CACHE_DURATION = 30000; // 30 segundos
+    const CACHE_DURATION =
+      parseInt(process.env.TEMPLATE_CACHE_DURATION) || 5 * 60 * 1000; // 5 minutos por padrão
 
     app.decorate("templateService", {
       getAvailableTemplates: getAvailableTemplates,
@@ -46,40 +47,45 @@ module.exports = fp(
           withFileTypes: true,
         });
 
-        for (const category of categories) {
-          if (category.isDirectory()) {
-            const categoryName = category.name;
-            const categoryPath = path.join(templatesDir, categoryName);
+        await Promise.all(
+          categories
+            .filter((category) => category.isDirectory())
+            .map(async (category) => {
+              const categoryName = category.name;
+              const categoryPath = path.join(templatesDir, categoryName);
 
-            app.log.info(`📂 Escaneando categoria: ${categoryName}`);
+              app.log.info(`📂 Escaneando categoria: ${categoryName}`);
 
-            // Escaneia arquivos .hbs na categoria
-            const templateFiles = await fs.readdir(categoryPath);
-            const categoryTemplates = [];
+              // Escaneia arquivos .hbs na categoria
+              const templateFiles = await fs.readdir(categoryPath);
 
-            for (const file of templateFiles) {
-              if (file.endsWith(".hbs")) {
-                const templatePath = path.join(categoryPath, file);
-                const templateInfo = await parseTemplateMetadata(
-                  templatePath,
-                  categoryName,
-                  file
-                );
+              const categoryTemplates = (
+                await Promise.all(
+                  templateFiles
+                    .filter((file) => file.endsWith(".hbs"))
+                    .map(async (file) => {
+                      const templatePath = path.join(categoryPath, file);
+                      const templateInfo = await parseTemplateMetadata(
+                        templatePath,
+                        categoryName,
+                        file
+                      );
 
-                if (templateInfo) {
-                  categoryTemplates.push(templateInfo);
-                  app.log.info(
-                    `✅ Template encontrado: ${templateInfo.type} (${templateInfo.name}) [${templateInfo.language}]`
-                  );
-                }
+                      if (templateInfo) {
+                        app.log.info(
+                          `✅ Template encontrado: ${templateInfo.type} (${templateInfo.name}) [${templateInfo.language}]`
+                        );
+                      }
+                      return templateInfo;
+                    })
+                )
+              ).filter(Boolean);
+
+              if (categoryTemplates.length > 0) {
+                templates[categoryName] = categoryTemplates;
               }
-            }
-
-            if (categoryTemplates.length > 0) {
-              templates[categoryName] = categoryTemplates;
-            }
-          }
-        }
+            })
+        );
 
         // Atualiza cache
         templatesCache = templates;
