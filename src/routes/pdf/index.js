@@ -107,17 +107,13 @@ module.exports = async (app) => {
           request.body
         );
 
-        // Headers para download
-        reply
-          .type(result.contentType)
-          .header(
-            "Content-Disposition",
-            `attachment; filename="${result.filename}"`
-          )
-          .header("Content-Length", result.buffer.length)
-          .header("X-PDF-Language", language);
+        // Faz upload do PDF para o storage
+        const url = await app.storageService.uploadPDF(
+          result.buffer,
+          result.filename
+        );
 
-        return reply.send(result.buffer);
+        return reply.send({ url });
       } catch (error) {
         app.log.error("Erro ao gerar PDF:", error);
 
