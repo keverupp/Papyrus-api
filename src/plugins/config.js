@@ -44,7 +44,7 @@ module.exports = fp(
 
       // Logging
       logging: {
-        level: process.env.LOG_LEVEL || "info",
+        level: process.env.LOG_LEVEL || "debug",
         toFile: process.env.LOG_TO_FILE === "true",
       },
 
@@ -85,6 +85,9 @@ module.exports = fp(
 
     // Decora o Fastify com as configurações
     app.decorate("config", config);
+
+    // Ajusta o nível do logger conforme configuração
+    app.log.level = config.logging.level;
 
     // Log das configurações na inicialização
     app.log.info("📋 Configurações carregadas:", {

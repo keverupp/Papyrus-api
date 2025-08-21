@@ -38,6 +38,8 @@ npm run dev
 
 🌐 **API running at:** `http://localhost:4000`
 
+To enable full debug logging, set `LOG_LEVEL=debug` in the `.env` file or as an environment variable before starting the server.
+
 ---
 
 ## 🔐 Authentication
