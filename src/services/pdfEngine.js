@@ -2,7 +2,7 @@
 
 const fp = require("fastify-plugin");
 const puppeteer = require("puppeteer");
-const PagePool = require("./pagePool");
+const PagePool = require("../utils/pagePool");
 
 module.exports = fp(
   async (app) => {
