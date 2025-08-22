@@ -2,10 +2,20 @@
 
 const fp = require("fastify-plugin");
 const puppeteer = require("puppeteer");
+const PagePool = require("../utils/pagePool");
 
 module.exports = fp(
   async (app) => {
     let browser = null;
+    const maxPages = parseInt(process.env.PAGE_POOL_SIZE, 10) || 5;
+    const pagePool = new PagePool(
+      async () => {
+        const currentBrowser = await initBrowser();
+        return currentBrowser.newPage();
+      },
+      maxPages,
+      app
+    );
 
     app.decorate("pdfService", {
       generatePDF: generatePDF,
@@ -14,6 +24,8 @@ module.exports = fp(
       applyWatermarkStyles: applyWatermarkStyles,
       optimizePage: optimizePage,
     });
+
+    app.decorate("pagePool", pagePool);
 
     /**
      * Inicializa o browser Puppeteer com configurações otimizadas
@@ -58,6 +70,7 @@ module.exports = fp(
         try {
           await browser.close();
           browser = null;
+          await app.pagePool.destroy();
           app.log.info("🛑 Browser Puppeteer fechado");
         } catch (error) {
           app.log.warn("⚠️ Erro ao fechar browser:", error);
@@ -69,8 +82,7 @@ module.exports = fp(
      * Gera PDF a partir do HTML renderizado usando configuração centralizada
      */
     async function generatePDF(htmlContent, templateType, userConfig = {}) {
-      const currentBrowser = await initBrowser();
-      const page = await currentBrowser.newPage();
+      const page = await app.pagePool.acquire();
 
       try {
         // Usa o serviço centralizado de configuração
@@ -141,9 +153,12 @@ module.exports = fp(
         throw new Error(`Falha na geração do PDF: ${error.message}`);
       } finally {
         try {
-          await page.close();
-        } catch (closeError) {
-          app.log.warn("⚠️ Erro ao fechar página:", closeError);
+          await app.pagePool.release(page);
+        } catch (releaseError) {
+          app.log.warn(
+            "⚠️ Erro ao devolver página ao pool:",
+            releaseError
+          );
         }
       }
     }
