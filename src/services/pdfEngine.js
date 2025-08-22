@@ -82,6 +82,9 @@ module.exports = fp(
         // Otimiza a página para melhor renderização
         await optimizePage(page, pdfConfig);
 
+        // Garante aplicação dos estilos de impressão
+        await page.emulateMediaType("print");
+
         // Define o HTML na página
         await page.setContent(htmlContent, {
           waitUntil: ["domcontentloaded", "networkidle0"],
