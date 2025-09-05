@@ -46,6 +46,14 @@ services:
       CACHE_TEMPLATES: ${CACHE_TEMPLATES}
       CACHE_DURATION: ${CACHE_DURATION}
 
+      # 🗄️ MinIO
+      S3_ENDPOINT: ${S3_ENDPOINT}
+      S3_REGION: ${S3_REGION}
+      S3_BUCKET: ${S3_BUCKET}
+      S3_ACCESS_KEY: ${S3_ACCESS_KEY}
+      S3_SECRET_KEY: ${S3_SECRET_KEY}
+      S3_PUBLIC_URL: ${S3_PUBLIC_URL}      
+
     volumes:
       - papyrus_pdf_cache:/app/cache
       - papyrus_logs:/app/logs
