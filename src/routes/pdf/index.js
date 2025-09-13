@@ -74,6 +74,14 @@ module.exports = async (app) => {
     handler: async (request, reply) => {
       try {
         const { language = "pt-BR" } = request.body;
+        const idKey = request.headers["idempotency-key"];
+
+        if (idKey) {
+          const cached = await app.queueService.getIdempotencyResult(idKey);
+          if (cached) {
+            return reply.code(200).send(cached);
+          }
+        }
 
         // Carrega traduções para mensagens de erro/sucesso
         const translations = await app.i18nService.getTranslations(language);
@@ -102,18 +110,19 @@ module.exports = async (app) => {
           language,
         });
 
-        // Gera o PDF usando o service
-        const result = await app.pdfGeneratorService.generateFullPDF(
-          request.body
-        );
-
-        // Faz upload do PDF para o storage
-        const url = await app.storageService.uploadPDF(
-          result.buffer,
-          result.filename
-        );
-
-        return reply.send({ url });
+        // Enfileira geração de PDF
+        const job = await app.queueService.enqueuePDF({
+          type: request.body.type,
+          data: request.body.data,
+          config: request.body.config,
+          language,
+        });
+        await app.queueService.setJobStatus(job.id, "queued");
+        const result = { job_id: job.id };
+        if (idKey) {
+          await app.queueService.setIdempotencyResult(idKey, result);
+        }
+        return reply.code(202).send(result);
       } catch (error) {
         app.log.error("Erro ao gerar PDF:", error);
 
@@ -121,17 +130,52 @@ module.exports = async (app) => {
         const translations = await app.i18nService.getTranslations(language);
 
         return reply.code(500).send({
-          error: "PDF Generation Failed",
+          error: "PDF Queue Failed",
           message: app.i18nService.formatMessage(
-            translations.api?.errors?.pdf_generation_failed ||
-              "Falha na geração do PDF: {{error}}",
+            translations.api?.errors?.internal_error ||
+              "Falha ao enfileirar o PDF: {{error}}",
             { error: error.message }
           ),
-          type: "generation_error",
+          type: "queue_error",
           statusCode: 500,
           language,
         });
       }
+    },
+  });
+
+  // Rota para verificar status do job
+  app.route({
+    method: "GET",
+    url: "/:job_id",
+    handler: async (request, reply) => {
+      const { job_id } = request.params;
+      const status = await app.queueService.getJobStatus(job_id);
+      if (!status) {
+        return reply.code(404).send({ error: "Job Not Found" });
+      }
+      return reply.send(status);
+    },
+  });
+
+  // Rota para obter URL de download
+  app.route({
+    method: "GET",
+    url: "/:job_id/download",
+    handler: async (request, reply) => {
+      const { job_id } = request.params;
+      const status = await app.queueService.getJobStatus(job_id);
+      if (!status) {
+        return reply.code(404).send({ error: "Job Not Found" });
+      }
+      if (status.status !== "completed") {
+        return reply
+          .code(400)
+          .send({ error: "Job not completed", status: status.status });
+      }
+      const { key, prefix, url } = status;
+      const finalUrl = url || (await app.storageService.getSignedPDFUrl(key));
+      return reply.send({ key, prefix, url: finalUrl });
     },
   });
 
@@ -243,7 +287,7 @@ module.exports = async (app) => {
     },
   });
 
-  // Rota para preview HTML (útil para debug)
+  // Rota para preview do conteúdo Typst (útil para debug)
   app.route({
     method: "POST",
     url: "/preview",
@@ -269,21 +313,21 @@ module.exports = async (app) => {
           });
         }
 
-        app.log.info("Gerando preview HTML", {
+        app.log.info("Gerando preview Typst", {
           api_key: request.apiKey?.name || "none",
           template_type: request.body.type,
           language,
         });
 
-        // Gera preview HTML usando o service
-        const htmlContent = await app.pdfGeneratorService.generatePreviewHTML(
+        // Gera preview Typst usando o service
+        const typstContent = await app.pdfGeneratorService.generatePreviewHTML(
           request.body
         );
 
         return reply
-          .type("text/html")
+          .type("text/plain")
           .header("X-Preview-Language", language)
-          .send(htmlContent);
+          .send(typstContent);
       } catch (error) {
         app.log.error("Erro ao gerar preview:", error);
 

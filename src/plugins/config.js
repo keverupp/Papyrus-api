@@ -31,7 +31,7 @@ module.exports = fp(
 
       // PDF Generation
       pdf: {
-        engine: process.env.PDF_ENGINE || "puppeteer",
+        engine: process.env.PDF_ENGINE || "typst",
         timeout: parseInt(process.env.PDF_TIMEOUT) || 30000,
         quality: process.env.PDF_QUALITY || "high",
       },
@@ -72,6 +72,16 @@ module.exports = fp(
         accessKey: process.env.S3_ACCESS_KEY || "",
         secretKey: process.env.S3_SECRET_KEY || "",
         publicUrl: process.env.S3_PUBLIC_URL || "",
+        prefixes: parseInt(process.env.S3_PREFIXES) || 10,
+      },
+
+      // Queue / Redis
+      queue: {
+        connection: {
+          host: process.env.REDIS_HOST || "localhost",
+          port: parseInt(process.env.REDIS_PORT) || 6379,
+        },
+        idempotencyTTL: parseInt(process.env.IDEMPOTENCY_TTL) || 3600,
       },
 
       // API Keys administrativas (para seeds/bootstrap)

@@ -4,17 +4,6 @@
 ARG NODE_VERSION=18-alpine
 FROM node:${NODE_VERSION} AS dependencies
 
-# Instala dependências do sistema necessárias para Puppeteer
-RUN apk add --no-cache \
-    chromium \
-    nss \
-    freetype \
-    freetype-dev \
-    harfbuzz \
-    ca-certificates \
-    ttf-freefont \
-    dumb-init
-
 # Define diretório de trabalho
 WORKDIR /app
 
@@ -22,8 +11,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Instala apenas dependências de produção
-RUN npm install --only=production && \
-    npm cache clean --force
+RUN npm install --only=production && npm cache clean --force
 
 # ===========================================
 # STAGE 2: Build
@@ -51,18 +39,6 @@ RUN rm -rf .git .github .vscode tests coverage \
 # ===========================================
 FROM node:${NODE_VERSION} AS production
 
-# Instala apenas o necessário para runtime
-RUN apk add --no-cache \
-    chromium \
-    nss \
-    freetype \
-    harfbuzz \
-    ca-certificates \
-    ttf-freefont \
-    dumb-init \
-    tini \
-    && rm -rf /var/cache/apk/*
-
 # Cria usuário não-root
 RUN addgroup -g 1001 -S nodejs && \
     adduser -S nodejs -u 1001
@@ -82,10 +58,8 @@ COPY --from=build --chown=nodejs:nodejs /app/package*.json ./
 RUN mkdir -p cache logs uploads custom-templates \
     && chown -R nodejs:nodejs cache logs uploads custom-templates
 
-# Configura Puppeteer para usar Chromium do sistema
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
-    NODE_ENV=production
+# Configuração de ambiente
+ENV NODE_ENV=production
 
 # Expõe porta
 EXPOSE 4000
@@ -93,22 +67,6 @@ EXPOSE 4000
 # Muda para usuário não-root
 USER nodejs
 
-# Labels para metadata
-LABEL maintainer="Papyrus Team <dev@papyrus.api>" \
-    version="1.0.0" \
-    description="Papyrus PDF Generation API" \
-    org.opencontainers.image.source="https://github.com/keverupp/papyrus-api" \
-    org.opencontainers.image.vendor="Papyrus" \
-    org.opencontainers.image.title="Papyrus API" \
-    org.opencontainers.image.description="Open-source PDF generation API with customizable templates" \
-    org.opencontainers.image.version="1.0.0" \
-    org.opencontainers.image.created="${BUILD_DATE}" \
-    org.opencontainers.image.revision="${VCS_REF}" \
-    com.centurylinklabs.watchtower.enable="true" \
-    portainer.webhook="true"
-
-# Usa dumb-init para gerenciar processos corretamente
-ENTRYPOINT ["dumb-init", "--"]
-
 # Comando para iniciar a aplicação
 CMD ["node", "app.js"]
+
