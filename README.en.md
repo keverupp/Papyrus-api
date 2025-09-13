@@ -13,6 +13,7 @@ Open-source API for **PDF generation with customizable templates**, built with *
 * Node.js 16+
 * External PostgreSQL
 * MinIO (or S3-compatible storage)
+* Redis
 * NPM or Yarn
 
 ### ⚙️ Installation
@@ -24,7 +25,7 @@ npm install
 
 # Set environment variables
 cp .env.example .env
-# Edit the .env file with your external PostgreSQL and MinIO credentials
+# Edit the .env file with your external PostgreSQL, MinIO and Redis credentials
 
 # Run migrations (make sure the database already exists)
 npm run migrate:latest

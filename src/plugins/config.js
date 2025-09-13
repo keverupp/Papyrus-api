@@ -1,5 +1,8 @@
 "use strict";
 
+// Carrega variáveis de ambiente do arquivo .env
+require("dotenv").config();
+
 const fp = require("fastify-plugin");
 
 module.exports = fp(

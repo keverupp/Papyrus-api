@@ -13,6 +13,7 @@ API open-source para **geração de PDFs com templates personalizáveis**, const
 - Node.js 16+
 - PostgreSQL externo
 - MinIO (ou serviço S3 compatível)
+- Redis
 - NPM ou Yarn
 
 ### ⚙️ Instalação
@@ -24,7 +25,7 @@ npm install
 
 # Configurar variáveis de ambiente
 cp .env.example .env
-# Edite o arquivo .env com as credenciais do PostgreSQL externo e do MinIO
+# Edite o arquivo .env com as credenciais do PostgreSQL externo, do MinIO e do Redis
 
 # Aplicar migrações (certifique-se de que o banco já existe)
 npm run migrate:latest
