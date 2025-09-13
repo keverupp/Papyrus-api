@@ -6,11 +6,12 @@ const fs = require("fs/promises");
 const path = require("path");
 const os = require("os");
 
-module.exports = fp(async (app) => {
-  app.decorate("typstEngine", {
-    generatePDF,
-    checkEngine,
-  });
+module.exports = fp(
+  async (app) => {
+    app.decorate("typstEngine", {
+      generatePDF,
+      checkEngine,
+    });
 
   /**
    * Verifica se o binário do typst está disponível
@@ -71,5 +72,7 @@ module.exports = fp(async (app) => {
       await fs.rm(tempDir, { recursive: true, force: true });
     }
   }
-});
+  },
+  { name: "typst-engine-service" }
+);
 

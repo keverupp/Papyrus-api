@@ -288,6 +288,6 @@ module.exports = fp(
   },
   {
     name: "pdf-generator-service",
-    dependencies: ["template-service", "pdf-service"], // Dependências atualizadas
+    dependencies: ["template-service", "typst-engine-service"],
   }
 );
