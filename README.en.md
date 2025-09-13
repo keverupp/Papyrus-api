@@ -25,7 +25,7 @@ npm install
 
 # Set environment variables
 cp .env.example .env
-# Edit the .env file with your external PostgreSQL, MinIO and Redis credentials
+# Edit the .env file with your external PostgreSQL, MinIO and Redis credentials (include password or URL if required)
 
 # Run migrations (make sure the database already exists)
 npm run migrate:latest

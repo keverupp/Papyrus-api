@@ -25,7 +25,7 @@ npm install
 
 # Configurar variáveis de ambiente
 cp .env.example .env
-# Edite o arquivo .env com as credenciais do PostgreSQL externo, do MinIO e do Redis
+# Edite o arquivo .env com as credenciais do PostgreSQL externo, do MinIO e do Redis (incluindo senha ou URL quando necessário)
 
 # Aplicar migrações (certifique-se de que o banco já existe)
 npm run migrate:latest
