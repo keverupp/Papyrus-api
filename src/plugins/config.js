@@ -81,7 +81,23 @@ module.exports = fp(
       // Queue / Redis
       queue: {
         connection: process.env.REDIS_URL
-          ? process.env.REDIS_URL
+          ? (() => {
+              try {
+                const url = new URL(process.env.REDIS_URL);
+                return {
+                  host: url.hostname,
+                  port: parseInt(url.port) || 6379,
+                  username: url.username || undefined,
+                  password: url.password || undefined,
+                };
+              } catch (err) {
+                return {
+                  host: process.env.REDIS_HOST || "localhost",
+                  port: parseInt(process.env.REDIS_PORT) || 6379,
+                  password: process.env.REDIS_PASSWORD,
+                };
+              }
+            })()
           : {
               host: process.env.REDIS_HOST || "localhost",
               port: parseInt(process.env.REDIS_PORT) || 6379,
