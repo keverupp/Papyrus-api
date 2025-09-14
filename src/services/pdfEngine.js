@@ -185,19 +185,18 @@ module.exports = fp(
         await page.setRequestInterception(true);
         page.on("request", (request) => {
           const resourceType = request.resourceType();
+          const url = request.url();
 
-          // Bloqueia recursos que não precisamos para PDF
+          const isLocal =
+            url.startsWith("data:") ||
+            url.startsWith("blob:") ||
+            url.includes("base64");
+
           if (["image", "media", "font", "stylesheet"].includes(resourceType)) {
-            // Permite apenas se for local ou essencial
-            const url = request.url();
-            if (
-              url.startsWith("data:") ||
-              url.startsWith("blob:") ||
-              url.includes("base64")
-            ) {
+            if (isLocal) {
               request.continue();
             } else {
-              request.continue(); // Por enquanto permite tudo, pode filtrar depois
+              request.abort();
             }
           } else {
             request.continue();
