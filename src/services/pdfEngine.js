@@ -113,6 +113,9 @@ module.exports = fp(
           }
         });
 
+        // Aguarda o carregamento de todas as imagens antes de gerar o PDF
+        await waitForImages(page);
+
         // Log das configurações aplicadas
         app.log.info("📋 Configurações de PDF aplicadas:", {
           template: templateType,
@@ -268,6 +271,37 @@ module.exports = fp(
       } catch (error) {
         app.log.warn("⚠️ Erro ao aplicar marca d'água:", error);
         // Continua mesmo com erro de marca d'água
+      }
+    }
+
+    /**
+     * Aguarda o carregamento de todas as imagens na página
+     */
+    async function waitForImages(page) {
+      try {
+        const results = await page.evaluate(async () => {
+          const imgs = Array.from(document.images);
+
+          return Promise.all(
+            imgs.map((img) =>
+              img.complete
+                ? { src: img.src, success: img.naturalWidth !== 0 }
+                : new Promise((resolve) => {
+                    img.onload = () => resolve({ src: img.src, success: true });
+                    img.onerror = () => resolve({ src: img.src, success: false });
+                  })
+            )
+          );
+        });
+
+        const failed = results.filter((r) => !r.success).map((r) => r.src);
+        if (failed.length) {
+          app.log.warn(
+            `⚠️ Algumas imagens não foram carregadas corretamente: ${failed.join(", ")}`
+          );
+        }
+      } catch (error) {
+        app.log.error("Erro ao aguardar carregamento das imagens:", error);
       }
     }
 

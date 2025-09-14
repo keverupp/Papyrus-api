@@ -7,6 +7,9 @@ const path = require("path");
 
 module.exports = fp(
   async (app) => {
+    // Cache de templates compilados
+    const templateCache = new Map();
+
     // Registra helpers customizados do Handlebars
     registerHelpers();
 
@@ -24,8 +27,17 @@ module.exports = fp(
     async function loadTemplate(templatePath) {
       try {
         const fullPath = path.resolve("src/templates", templatePath);
+
+        const stats = await fs.stat(fullPath);
+        const cached = templateCache.get(fullPath);
+        if (cached && cached.mtimeMs === stats.mtimeMs) {
+          return cached.compiled;
+        }
+
         const templateContent = await fs.readFile(fullPath, "utf8");
-        return handlebars.compile(templateContent);
+        const compiled = handlebars.compile(templateContent);
+        templateCache.set(fullPath, { compiled, mtimeMs: stats.mtimeMs });
+        return compiled;
       } catch (error) {
         app.log.error(`Erro ao carregar template ${templatePath}:`, error);
         throw new Error(`Template não encontrado: ${templatePath}`);
