@@ -6,6 +6,8 @@ const fastify = require("fastify");
 async function createApp() {
   const app = fastify({ logger: false });
   await app.register(require("../plugins/config"));
+  await app.register(require("../plugins/handlebars"));
+  await app.register(require("../services/template"));
   await app.register(require("../services/metrics"));
   await app.register(require("../services/typstEngine"));
   await app.register(require("../services/pdfGenerator"));
