@@ -10,8 +10,8 @@ module.exports = async (app) => {
         // Testa conexão com banco
         await app.knex.raw("SELECT 1");
 
-        // Testa browser do Puppeteer
-        await app.pdfService.initBrowser();
+        // Testa engine typst
+        await app.typstEngine.checkEngine();
 
         return reply.send({
           status: "healthy",
@@ -80,10 +80,10 @@ module.exports = async (app) => {
 
       // Testa PDF engine
       try {
-        await app.pdfService.initBrowser();
+        await app.typstEngine.checkEngine();
         services.pdf_engine = {
           status: "ready",
-          engine: "puppeteer",
+          engine: "typst",
         };
       } catch (error) {
         services.pdf_engine = {

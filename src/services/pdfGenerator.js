@@ -48,18 +48,14 @@ module.exports = fp(
           ...data,
         };
 
-        // Renderiza o template HTML (já com suporte a idioma)
-        const htmlContent = await app.templateService.renderTemplate(
+        // Renderiza o template Typst (já com suporte a idioma)
+        const typstContent = await app.templateService.renderTemplate(
           type,
           templateData
         );
 
-        // Gera o PDF usando o novo sistema
-        const pdfBuffer = await app.pdfService.generatePDF(
-          htmlContent,
-          type,
-          config
-        );
+        // Gera o PDF usando o typst
+        const pdfBuffer = await app.typstEngine.generatePDF(typstContent);
 
         // Nome do arquivo com sanitização melhorada
         const sanitizedTitle = title
@@ -124,20 +120,20 @@ module.exports = fp(
           ...data,
         };
 
-        // Renderiza apenas o HTML
-        const htmlContent = await app.templateService.renderTemplate(
+        // Renderiza apenas o conteúdo Typst
+        const typstContent = await app.templateService.renderTemplate(
           type,
           templateData
         );
 
-        app.log.info("👁️ Preview HTML gerado", {
+        app.log.info("👁️ Preview Typst gerado", {
           template_type: type,
           title,
           language,
-          html_size: htmlContent.length,
+          typst_size: typstContent.length,
         });
 
-        return htmlContent;
+        return typstContent;
       } catch (error) {
         app.log.error("❌ Erro na geração do preview HTML:", {
           error: error.message,
@@ -292,6 +288,6 @@ module.exports = fp(
   },
   {
     name: "pdf-generator-service",
-    dependencies: ["template-service", "pdf-service"], // Dependências atualizadas
+    dependencies: ["template-service", "typst-engine-service"],
   }
 );

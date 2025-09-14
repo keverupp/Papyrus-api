@@ -2,7 +2,7 @@
 
 [🇧🇷 Versão em Português](README.md) | [🇺🇸 English Version](README.en.md)
 
-API open-source para **geração de PDFs com templates personalizáveis**, construída com **Fastify** e **Puppeteer**. Ideal para aplicações educacionais, empresariais, médicas e documentos diversos.
+API open-source para **geração de PDFs com templates personalizáveis**, construída com **Fastify** e **Typst**. Ideal para aplicações educacionais, empresariais, médicas e documentos diversos.
 
 ---
 
@@ -11,7 +11,10 @@ API open-source para **geração de PDFs com templates personalizáveis**, const
 ### 📋 Pré-requisitos
 
 - Node.js 16+
-- PostgreSQL
+- PostgreSQL externo
+- MinIO (ou serviço S3 compatível)
+- Redis
+- Typst CLI (defina `TYPST_BIN` se não estiver no PATH)
 - NPM ou Yarn
 
 ### ⚙️ Instalação
@@ -23,10 +26,9 @@ npm install
 
 # Configurar variáveis de ambiente
 cp .env.example .env
-# Edite o arquivo .env com suas configurações
+# Edite o arquivo .env com as credenciais do PostgreSQL externo, do MinIO e do Redis (incluindo senha ou URL quando necessário)
 
-# Criar banco e aplicar migrações
-createdb papyrus
+# Aplicar migrações (certifique-se de que o banco já existe)
 npm run migrate:latest
 
 # Criar API keys de exemplo

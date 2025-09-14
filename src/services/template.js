@@ -56,13 +56,13 @@ module.exports = fp(
 
               app.log.info(`📂 Escaneando categoria: ${categoryName}`);
 
-              // Escaneia arquivos .hbs na categoria
+              // Escaneia arquivos .typ na categoria
               const templateFiles = await fs.readdir(categoryPath);
 
               const categoryTemplates = (
                 await Promise.all(
                   templateFiles
-                    .filter((file) => file.endsWith(".hbs"))
+                    .filter((file) => file.endsWith(".typ"))
                     .map(async (file) => {
                       const templatePath = path.join(categoryPath, file);
                       const templateInfo = await parseTemplateMetadata(
@@ -123,7 +123,7 @@ module.exports = fp(
           const metadata = parseMetadataText(metadataText);
 
           return {
-            type: metadata.type || path.basename(fileName, ".hbs"),
+            type: metadata.type || path.basename(fileName, ".typ"),
             name: metadata.name || metadata.type || fileName,
             description:
               metadata.description || `Template ${metadata.type || fileName}`,
@@ -140,10 +140,10 @@ module.exports = fp(
           };
         } else {
           // Fallback: gera metadados básicos baseado no nome do arquivo
-          const type = path.basename(fileName, ".hbs");
+          const type = path.basename(fileName, ".typ");
 
-          // Detecta idioma pelo sufixo do arquivo (ex: budget-premium.en-US.hbs)
-          const languageMatch = fileName.match(/\.([a-z]{2}-[A-Z]{2})\.hbs$/);
+          // Detecta idioma pelo sufixo do arquivo (ex: budget-premium.en-US.typ)
+          const languageMatch = fileName.match(/\.([a-z]{2}-[A-Z]{2})\.typ$/);
           const detectedLanguage = languageMatch ? languageMatch[1] : "pt-BR";
           const cleanType = type.replace(/\.[a-z]{2}-[A-Z]{2}$/, ""); // Remove sufixo de idioma
 
@@ -226,7 +226,7 @@ module.exports = fp(
             type: "blank",
             name: "Página em Branco",
             description: "Documento básico sem formatação específica",
-            template: "basic/blank.hbs",
+            template: "basic/blank.typ",
             language: "pt-BR",
           },
         ],
@@ -235,7 +235,7 @@ module.exports = fp(
             type: "exam",
             name: "Prova/Exame",
             description: "Template para provas e exames escolares",
-            template: "educational/exam.hbs",
+            template: "educational/exam.typ",
             language: "pt-BR",
           },
         ],
@@ -245,7 +245,7 @@ module.exports = fp(
             name: "Orçamento Premium",
             description:
               "Template de orçamento avançado com logo e marca d'água",
-            template: "business/budget-premium.hbs",
+            template: "business/budget-premium.typ",
             language: "pt-BR",
           },
         ],
@@ -273,7 +273,7 @@ module.exports = fp(
         const templates = [];
 
         for (const file of files) {
-          if (file.endsWith(".hbs")) {
+          if (file.endsWith(".typ")) {
             const templatePath = path.join(templatesDir, file);
             const templateInfo = await parseTemplateMetadata(
               templatePath,

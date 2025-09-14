@@ -1,4 +1,11 @@
-require("dotenv").config();
+const path = require("path");
+
+// Explicitly load the root `.env` file since the knex CLI changes the
+// working directory to this folder when executing migrations or seeds.
+// Without the `path` option, `dotenv` would look for an `.env` inside
+// `config/knexfile/`, causing database connection variables to be
+// undefined.
+require("dotenv").config({ path: path.join(__dirname, "..", "..", ".env") });
 
 module.exports = {
   development: {

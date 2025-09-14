@@ -1,5 +1,8 @@
 "use strict";
 
+// Carrega variáveis de ambiente do arquivo .env
+require("dotenv").config();
+
 const fp = require("fastify-plugin");
 
 module.exports = fp(
@@ -31,9 +34,10 @@ module.exports = fp(
 
       // PDF Generation
       pdf: {
-        engine: process.env.PDF_ENGINE || "puppeteer",
+        engine: process.env.PDF_ENGINE || "typst",
         timeout: parseInt(process.env.PDF_TIMEOUT) || 30000,
         quality: process.env.PDF_QUALITY || "high",
+        typstBin: process.env.TYPST_BIN || "typst",
       },
 
       // Cache
@@ -72,6 +76,35 @@ module.exports = fp(
         accessKey: process.env.S3_ACCESS_KEY || "",
         secretKey: process.env.S3_SECRET_KEY || "",
         publicUrl: process.env.S3_PUBLIC_URL || "",
+        prefixes: parseInt(process.env.S3_PREFIXES) || 10,
+      },
+
+      // Queue / Redis
+      queue: {
+        connection: process.env.REDIS_URL
+          ? (() => {
+              try {
+                const url = new URL(process.env.REDIS_URL);
+                return {
+                  host: url.hostname,
+                  port: parseInt(url.port) || 6379,
+                  username: url.username || undefined,
+                  password: url.password || undefined,
+                };
+              } catch (err) {
+                return {
+                  host: process.env.REDIS_HOST || "localhost",
+                  port: parseInt(process.env.REDIS_PORT) || 6379,
+                  password: process.env.REDIS_PASSWORD,
+                };
+              }
+            })()
+          : {
+              host: process.env.REDIS_HOST || "localhost",
+              port: parseInt(process.env.REDIS_PORT) || 6379,
+              password: process.env.REDIS_PASSWORD,
+            },
+        idempotencyTTL: parseInt(process.env.IDEMPOTENCY_TTL) || 3600,
       },
 
       // API Keys administrativas (para seeds/bootstrap)
