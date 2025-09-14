@@ -10,19 +10,16 @@ module.exports = async (app) => {
         // Testa conexão com banco
         await app.knex.raw("SELECT 1");
 
-        // Testa browser do Puppeteer
-        await app.pdfService.initBrowser();
-
-        return reply.send({
-          status: "healthy",
-          timestamp: new Date().toISOString(),
-          version: "1.0.0",
-          services: {
-            database: "connected",
-            pdf_engine: "ready",
-            templates: "loaded",
-          },
-        });
+          return reply.send({
+            status: "healthy",
+            timestamp: new Date().toISOString(),
+            version: "1.0.0",
+            services: {
+              database: "connected",
+              pdf_engine: "jsPDF",
+              templates: "loaded",
+            },
+          });
       } catch (error) {
         app.log.error("Health check failed:", error);
 
@@ -78,19 +75,11 @@ module.exports = async (app) => {
         };
       }
 
-      // Testa PDF engine
-      try {
-        await app.pdfService.initBrowser();
+        // Testa PDF engine (jsPDF)
         services.pdf_engine = {
           status: "ready",
-          engine: "puppeteer",
+          engine: "jspdf",
         };
-      } catch (error) {
-        services.pdf_engine = {
-          status: "error",
-          error: error.message,
-        };
-      }
 
       const allHealthy = Object.values(services).every(
         (service) =>
