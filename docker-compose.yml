@@ -61,7 +61,7 @@ services:
       - papyrus_templates:/app/custom-templates
 
     ports:
-      - "${PORT:-4000}:4000"
+      - "${PORT:-4001}:4000"
 
     networks:
       - papyrus-network
