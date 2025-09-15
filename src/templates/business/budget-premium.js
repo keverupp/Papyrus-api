@@ -250,8 +250,14 @@ async function generateBudgetPremium(data) {
   });
 
   if (data.budget.validUntil) {
+    const rawValidUntil = data.budget.validUntil;
+    const parsedValidUntil = new Date(rawValidUntil);
+    const formattedValidUntil = Number.isNaN(parsedValidUntil.valueOf())
+      ? rawValidUntil
+      : parsedValidUntil.toLocaleDateString("pt-BR");
+
     doc.text(
-      `Válida até: ${data.budget.validUntil}`,
+      `Válida até: ${formattedValidUntil}`,
       pageWidth - margin.right,
       y + 13,
       { align: "right" }
@@ -294,27 +300,23 @@ async function generateBudgetPremium(data) {
     doc.setTextColor(...colors.primary);
     doc.text("CLIENTE", margin.left + 4, y + 5);
 
-    // Dados em linha única
+    // Dados formatados conforme solicitado
     doc.setFont("helvetica", "normal");
     doc.setFontSize(6);
+    doc.setTextColor(...colors.text);
+
     let yClient = y + 10;
+    const clientName = data.budget.client.name
+      ? `Cliente: ${data.budget.client.name}`
+      : "Cliente:";
+    doc.text(clientName, margin.left + 4, yClient);
 
-    const clientData = [
-      data.budget.client.name,
-      data.budget.client.document,
-      data.budget.client.email,
-      data.budget.client.phone,
-    ].filter(Boolean);
-
-    if (clientData.length > 0) {
-      doc.setTextColor(...colors.text);
-      const clientText = clientData.join(" | ");
-      const clientLines = breakText(clientText, contentWidth - 8, 6);
-      doc.text(clientLines[0] || "", margin.left + 4, yClient);
-
-      if (clientLines[1]) {
-        doc.text(clientLines[1], margin.left + 4, yClient + 4);
-      }
+    if (data.budget.client.phone) {
+      doc.text(
+        `Contato: ${data.budget.client.phone}`,
+        margin.left + 4,
+        yClient + 4
+      );
     }
 
     y += clientBoxHeight + 6;
@@ -532,11 +534,29 @@ async function generateBudgetPremium(data) {
 
   // OBSERVAÇÕES E TERMOS COM BORDAS LIMPAS
   if (data.budget.notes || data.budget.terms) {
-    checkPageBreak(20);
+    const sectionWidth = (contentWidth - 6) / 2;
+    const lineHeight = 3;
+    const minSectionHeight = 18;
+
+    const notesLines = data.budget.notes
+      ? breakText(data.budget.notes, sectionWidth - 8, 6)
+      : [];
+    const termsLines = data.budget.terms
+      ? breakText(data.budget.terms, sectionWidth - 8, 6)
+      : [];
+
+    const notesHeight = notesLines.length
+      ? Math.max(minSectionHeight, 10 + notesLines.length * lineHeight)
+      : 0;
+    const termsHeight = termsLines.length
+      ? Math.max(minSectionHeight, 10 + termsLines.length * lineHeight)
+      : 0;
+
+    const sectionHeight = Math.max(minSectionHeight, notesHeight, termsHeight);
+
+    checkPageBreak(sectionHeight + 10);
 
     y += 3;
-    const sectionWidth = (contentWidth - 6) / 2;
-    const sectionHeight = 18;
     const sectionRadius = 3;
 
     // Observações
@@ -559,11 +579,8 @@ async function generateBudgetPremium(data) {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(6);
       doc.setTextColor(...colors.text);
-      const notesLines = breakText(data.budget.notes, sectionWidth - 8, 6);
       notesLines.forEach((line, index) => {
-        if (y + 8 + index * 3 < y + sectionHeight - 1 && index < 3) {
-          doc.text(line, margin.left + 4, y + 8 + index * 3);
-        }
+        doc.text(line, margin.left + 4, y + 8 + index * lineHeight);
       });
     }
 
@@ -589,15 +606,12 @@ async function generateBudgetPremium(data) {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(6);
       doc.setTextColor(...colors.text);
-      const termsLines = breakText(data.budget.terms, sectionWidth - 8, 6);
       termsLines.forEach((line, index) => {
-        if (y + 8 + index * 3 < y + sectionHeight - 1 && index < 3) {
-          doc.text(line, termsX + 4, y + 8 + index * 3);
-        }
+        doc.text(line, termsX + 4, y + 8 + index * lineHeight);
       });
     }
 
-    y += 25;
+    y += sectionHeight + 7;
   }
 
   // RODAPÉ COM BORDAS LIMPAS
