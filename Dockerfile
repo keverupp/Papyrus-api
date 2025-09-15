@@ -69,7 +69,7 @@ RUN mkdir -p cache logs uploads custom-templates \
 ENV NODE_ENV=production
 
 # Expõe porta
-EXPOSE 4000
+EXPOSE 4001
 
 # Muda para usuário não-root
 USER nodejs
