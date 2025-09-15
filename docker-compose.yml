@@ -12,8 +12,8 @@ services:
 
     environment:
       # 🌐 Servidor
-      PORT: ${PORT:-4001}
-      HOST: ${HOST:-0.0.0.0}
+      PORT: ${PORT:-4001}          # ← CORRIGIDO: Agora usa 4001 internamente
+      HOST: ${HOST:-0.0.0.0}       # ← HOST correto para acesso externo
       NODE_ENV: ${NODE_ENV:-production}
 
       # 💾 Banco de dados PostgreSQL
@@ -61,7 +61,7 @@ services:
       - papyrus_templates:/app/custom-templates
 
     ports:
-      - "${PORT:-4001}:4000"
+      - "${PORT:-4001}:4001"       # ← CORRIGIDO: 4001:4001 (externa:interna)
 
     networks:
       - papyrus-network
