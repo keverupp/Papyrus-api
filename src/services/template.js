@@ -364,27 +364,34 @@ module.exports = fp(
         const allTemplates = await getAvailableTemplates();
         const flatTemplates = Object.values(allTemplates).flat();
 
-        // Procura template no idioma específico
-        const template = flatTemplates.find(
+        // Prioriza templates JS (jsPDF)
+        const templates = flatTemplates.filter(
           (t) => t.type === templateType && t.language === language
         );
 
+        const template =
+          templates.find((t) => t.extension === "js") || templates[0];
+
         if (template) {
           app.log.debug(
-            `✅ Template encontrado: ${templateType} em ${language}`
+            `✅ Template encontrado: ${templateType} em ${language} (${template.extension})`
           );
           return template;
         }
 
         // Fallback para idioma padrão se não encontrar
         if (language !== "pt-BR") {
-          const fallbackTemplate = flatTemplates.find(
+          const fallbackTemplates = flatTemplates.filter(
             (t) => t.type === templateType && t.language === "pt-BR"
           );
 
+          const fallbackTemplate =
+            fallbackTemplates.find((t) => t.extension === "js") ||
+            fallbackTemplates[0];
+
           if (fallbackTemplate) {
             app.log.warn(
-              `⚠️ Template ${templateType} não encontrado em ${language}, usando pt-BR`
+              `⚠️ Template ${templateType} não encontrado em ${language}, usando pt-BR (${fallbackTemplate.extension})`
             );
             return fallbackTemplate;
           }
