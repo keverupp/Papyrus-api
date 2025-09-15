@@ -66,73 +66,91 @@ module.exports = async (app) => {
     },
   };
 
+  async function handlePdfRequest(request, reply, { mode = "upload" } = {}) {
+    try {
+      const { language = "pt-BR" } = request.body;
+
+      // Carrega traduções para mensagens de erro/sucesso
+      const translations = await app.i18nService.getTranslations(language);
+
+      // Valida dados da requisição
+      const validation = app.pdfGeneratorService.validatePdfRequest(request.body);
+      if (!validation.isValid) {
+        return reply.code(400).send({
+          error: "Validation Error",
+          message:
+            translations.api?.errors?.validation_error ||
+            "Dados da requisição inválidos",
+          details: validation.errors,
+          statusCode: 400,
+          language,
+        });
+      }
+
+      // Log da requisição
+      app.log.info(
+        mode === "inline" ? "Processando visualização de PDF" : "Processando geração de PDF",
+        {
+          api_key: request.apiKey?.name || "none",
+          template_type: request.body.type,
+          title: request.body.title,
+          language,
+          response_mode: mode,
+        }
+      );
+
+      // Gera o PDF usando o service
+      const result = await app.pdfGeneratorService.generateFullPDF(request.body);
+
+      if (mode === "inline") {
+        return reply
+          .type(result.contentType || "application/pdf")
+          .header("Content-Disposition", `inline; filename="${result.filename}"`)
+          .header("Content-Length", result.buffer.length)
+          .send(result.buffer);
+      }
+
+      // Faz upload do PDF para o storage
+      const url = await app.storageService.uploadPDF(result.buffer, result.filename);
+
+      return reply.send({ url });
+    } catch (error) {
+      app.log.error(
+        mode === "inline" ? "Erro ao visualizar PDF:" : "Erro ao gerar PDF:",
+        error
+      );
+
+      const language = request.body?.language || "pt-BR";
+      const translations = await app.i18nService.getTranslations(language);
+
+      return reply.code(500).send({
+        error: "PDF Generation Failed",
+        message: app.i18nService.formatMessage(
+          translations.api?.errors?.pdf_generation_failed ||
+            "Falha na geração do PDF: {{error}}",
+          { error: error.message }
+        ),
+        type: "generation_error",
+        statusCode: 500,
+        language,
+      });
+    }
+  }
+
   // Rota principal para geração de PDF
   app.route({
     method: "POST",
     url: "/",
     schema: pdfSchema,
-    handler: async (request, reply) => {
-      try {
-        const { language = "pt-BR" } = request.body;
+    handler: (request, reply) => handlePdfRequest(request, reply, { mode: "upload" }),
+  });
 
-        // Carrega traduções para mensagens de erro/sucesso
-        const translations = await app.i18nService.getTranslations(language);
-
-        // Valida dados da requisição
-        const validation = app.pdfGeneratorService.validatePdfRequest(
-          request.body
-        );
-        if (!validation.isValid) {
-          return reply.code(400).send({
-            error: "Validation Error",
-            message:
-              translations.api?.errors?.validation_error ||
-              "Dados da requisição inválidos",
-            details: validation.errors,
-            statusCode: 400,
-            language,
-          });
-        }
-
-        // Log da requisição
-        app.log.info("Processando geração de PDF", {
-          api_key: request.apiKey?.name || "none",
-          template_type: request.body.type,
-          title: request.body.title,
-          language,
-        });
-
-        // Gera o PDF usando o service
-        const result = await app.pdfGeneratorService.generateFullPDF(
-          request.body
-        );
-
-        // Faz upload do PDF para o storage
-        const url = await app.storageService.uploadPDF(
-          result.buffer,
-          result.filename
-        );
-
-        return reply.send({ url });
-      } catch (error) {
-        app.log.error("Erro ao gerar PDF:", error);
-
-        const language = request.body?.language || "pt-BR";
-        const translations = await app.i18nService.getTranslations(language);
-
-        return reply.code(500).send({
-          error: "PDF Generation Failed",
-          message: app.i18nService.formatMessage(
-            translations.api?.errors?.pdf_generation_failed ||
-              "Falha na geração do PDF: {{error}}",
-            { error: error.message }
-          ),
-          type: "generation_error",
-          statusCode: 500,
-          language,
-        });
-      }
-    },
+  // Rota para visualizar PDF diretamente no navegador
+  app.route({
+    method: "POST",
+    url: "/view",
+    schema: pdfSchema,
+    handler: (request, reply) => handlePdfRequest(request, reply, { mode: "inline" }),
   });
 
   // Rota para listar templates disponíveis (com suporte a idioma)
