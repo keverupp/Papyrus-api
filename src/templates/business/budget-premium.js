@@ -1,4 +1,5 @@
 const { jsPDF } = require("jspdf");
+const sharp = require("sharp");
 
 async function generateBudgetPremium(data) {
   const doc = new jsPDF({
@@ -30,6 +31,29 @@ async function generateBudgetPremium(data) {
     zebraDark: [240, 244, 248], // Cinza mais visível
     tableBorder: [200, 206, 212], // Cinza para linhas separadoras
   };
+
+  // Conversão segura de imagens para base64
+  async function fetchImageAsBase64(url) {
+    const res = await fetch(url);
+    const contentType = res.headers.get("content-type") || "";
+    const arrayBuffer = await res.arrayBuffer();
+    let buffer = Buffer.from(arrayBuffer);
+
+    if (contentType.includes("svg")) {
+      try {
+        buffer = await sharp(buffer).png().toBuffer();
+        return `data:image/png;base64,${buffer.toString("base64")}`;
+      } catch (err) {
+        console.warn("Erro ao converter SVG:", err);
+        return null;
+      }
+    }
+
+    const format = contentType.includes("jpeg") || contentType.includes("jpg")
+      ? "jpeg"
+      : "png";
+    return `data:image/${format};base64,${buffer.toString("base64")}`;
+  }
 
   // FUNÇÃO CORRIGIDA PARA BORDAS ARREDONDADAS SEM ARTEFATOS
   function drawRoundedRect(
@@ -178,36 +202,76 @@ async function generateBudgetPremium(data) {
     return false;
   }
 
+  // Marca d'água opcional
+  if (data.watermark) {
+    try {
+      if (data.watermark.type === "logo" && data.watermark.logo?.url) {
+        const wmBase64 = await fetchImageAsBase64(data.watermark.logo.url);
+        if (wmBase64) {
+          const maxW = pageWidth * 0.6;
+          const maxH = pageHeight * 0.6;
+          const wmDims = calculateImageDimensions(wmBase64, maxW, maxH);
+          const x = (pageWidth - wmDims.width) / 2;
+          const yW = (pageHeight - wmDims.height) / 2;
+          if (doc.setGState) {
+            const gs = doc.GState({ opacity: data.watermark.opacity || 0.05 });
+            doc.setGState(gs);
+          }
+          doc.addImage(wmBase64, "PNG", x, yW, wmDims.width, wmDims.height);
+          if (doc.setGState) {
+            const gs = doc.GState({ opacity: 1 });
+            doc.setGState(gs);
+          }
+        }
+      } else if (data.watermark.type === "text" && data.watermark.text) {
+        if (doc.setGState) {
+          const gs = doc.GState({ opacity: data.watermark.opacity || 0.05 });
+          doc.setGState(gs);
+        }
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(parseInt(data.watermark.fontSize) || 60);
+        doc.setTextColor(...colors.muted);
+        doc.text(data.watermark.text, pageWidth / 2, pageHeight / 2, {
+          align: "center",
+          angle: data.watermark.rotation || -45,
+        });
+        if (doc.setGState) {
+          const gs = doc.GState({ opacity: 1 });
+          doc.setGState(gs);
+        }
+      }
+    } catch (err) {
+      console.warn("Erro ao aplicar watermark:", err);
+    }
+  }
+
   // CABEÇALHO ULTRA-COMPACTO
   const headerHeight = 22;
   let xLogo = margin.left;
 
   if (data.logo && data.logo.url) {
     try {
-      const logoRes = await fetch(data.logo.url);
-      const logoArrayBuffer = await logoRes.arrayBuffer();
-      const logoBuf = Buffer.from(logoArrayBuffer);
-      const logoBase64 = `data:image/png;base64,${logoBuf.toString("base64")}`;
+      const logoBase64 = await fetchImageAsBase64(data.logo.url);
+      if (logoBase64) {
+        const maxLogoWidth = 25;
+        const maxLogoHeight = 12;
 
-      const maxLogoWidth = 25;
-      const maxLogoHeight = 12;
+        const logoDims = calculateImageDimensions(
+          logoBase64,
+          maxLogoWidth,
+          maxLogoHeight
+        );
 
-      // USA A FUNÇÃO CORRIGIDA PARA CALCULAR DIMENSÕES
-      const logoDims = calculateImageDimensions(
-        logoBase64,
-        maxLogoWidth,
-        maxLogoHeight
-      );
-
-      doc.addImage(
-        logoBase64,
-        "PNG",
-        xLogo,
-        y,
-        logoDims.width,
-        logoDims.height
-      );
-      xLogo += logoDims.width + 5;
+        doc.addImage(
+          logoBase64,
+          "PNG",
+          xLogo,
+          y,
+          logoDims.width,
+          logoDims.height
+        );
+        xLogo += logoDims.width + 5;
+      }
     } catch (error) {
       console.warn("Erro ao carregar logo:", error);
     }
@@ -530,16 +594,23 @@ async function generateBudgetPremium(data) {
 
   y += 15;
 
-  // OBSERVAÇÕES E TERMOS COM BORDAS LIMPAS
+  // OBSERVAÇÕES E TERMOS COM ALTURA DINÂMICA
   if (data.budget.notes || data.budget.terms) {
-    checkPageBreak(20);
-
-    y += 3;
     const sectionWidth = (contentWidth - 6) / 2;
-    const sectionHeight = 18;
+    const lineHeight = 3;
+    const notesLines = data.budget.notes
+      ? breakText(data.budget.notes, sectionWidth - 8, 6)
+      : [];
+    const termsLines = data.budget.terms
+      ? breakText(data.budget.terms, sectionWidth - 8, 6)
+      : [];
+    const maxLines = Math.max(notesLines.length, termsLines.length);
+    const sectionHeight = maxLines * lineHeight + 10;
+
+    checkPageBreak(sectionHeight + 5);
+    y += 3;
     const sectionRadius = 3;
 
-    // Observações
     if (data.budget.notes) {
       drawRoundedRect(
         margin.left,
@@ -550,7 +621,6 @@ async function generateBudgetPremium(data) {
         colors.light,
         colors.border
       );
-
       doc.setFont("helvetica", "bold");
       doc.setFontSize(6);
       doc.setTextColor(...colors.primary);
@@ -559,18 +629,16 @@ async function generateBudgetPremium(data) {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(6);
       doc.setTextColor(...colors.text);
-      const notesLines = breakText(data.budget.notes, sectionWidth - 8, 6);
       notesLines.forEach((line, index) => {
-        if (y + 8 + index * 3 < y + sectionHeight - 1 && index < 3) {
-          doc.text(line, margin.left + 4, y + 8 + index * 3);
+        const lineY = y + 8 + index * lineHeight;
+        if (lineY < y + sectionHeight - 1) {
+          doc.text(line, margin.left + 4, lineY);
         }
       });
     }
 
-    // Termos
     if (data.budget.terms) {
       const termsX = margin.left + sectionWidth + 6;
-
       drawRoundedRect(
         termsX,
         y,
@@ -580,7 +648,6 @@ async function generateBudgetPremium(data) {
         colors.light,
         colors.border
       );
-
       doc.setFont("helvetica", "bold");
       doc.setFontSize(6);
       doc.setTextColor(...colors.primary);
@@ -589,15 +656,15 @@ async function generateBudgetPremium(data) {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(6);
       doc.setTextColor(...colors.text);
-      const termsLines = breakText(data.budget.terms, sectionWidth - 8, 6);
       termsLines.forEach((line, index) => {
-        if (y + 8 + index * 3 < y + sectionHeight - 1 && index < 3) {
-          doc.text(line, termsX + 4, y + 8 + index * 3);
+        const lineY = y + 8 + index * lineHeight;
+        if (lineY < y + sectionHeight - 1) {
+          doc.text(line, termsX + 4, lineY);
         }
       });
     }
 
-    y += 25;
+    y += sectionHeight + 7;
   }
 
   // RODAPÉ COM BORDAS LIMPAS
