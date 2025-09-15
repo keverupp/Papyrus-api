@@ -30,8 +30,8 @@ module.exports = fp(
       },
 
       // PDF Generation
-      pdf: {
-        engine: process.env.PDF_ENGINE || "puppeteer",
+        pdf: {
+          engine: process.env.PDF_ENGINE || "jspdf",
         timeout: parseInt(process.env.PDF_TIMEOUT) || 30000,
         quality: process.env.PDF_QUALITY || "high",
       },
