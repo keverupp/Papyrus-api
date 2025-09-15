@@ -135,6 +135,104 @@ module.exports = async (app) => {
     },
   });
 
+  // Rota para visualizar um PDF diretamente do storage
+  app.route({
+    method: "GET",
+    url: "/view/:id",
+    schema: {
+      params: {
+        type: "object",
+        required: ["id"],
+        properties: {
+          id: { type: "string" },
+        },
+      },
+      querystring: languageQuerySchema.querystring,
+    },
+    handler: async (request, reply) => {
+      const { id } = request.params;
+      const { lang = "pt-BR" } = request.query || {};
+
+      let objectKey = id;
+
+      try {
+        objectKey = decodeURIComponent(id);
+      } catch (decodeError) {
+        app.log.warn("Falha ao decodificar identificador do PDF", {
+          id,
+          error: decodeError.message,
+        });
+      }
+
+      try {
+        app.log.info("Transmitindo PDF diretamente do storage", {
+          key: objectKey,
+          api_key: request.apiKey?.name || "none",
+        });
+
+        const pdfObject = await app.storageService.getPDFStream(objectKey);
+
+        const sanitizedName = (objectKey || "")
+          .replace(/[\\/]/g, "_")
+          .replace(/[^a-zA-Z0-9._-]/g, "_");
+        const baseName = sanitizedName || "document";
+        const filename = baseName.toLowerCase().endsWith(".pdf")
+          ? baseName
+          : `${baseName}.pdf`;
+
+        reply
+          .type(pdfObject.contentType || "application/pdf")
+          .header("Content-Disposition", `inline; filename="${filename}"`);
+
+        if (pdfObject.contentLength) {
+          reply.header("Content-Length", pdfObject.contentLength);
+        }
+
+        if (pdfObject.lastModified) {
+          const lastModified =
+            pdfObject.lastModified instanceof Date
+              ? pdfObject.lastModified.toUTCString()
+              : pdfObject.lastModified;
+          reply.header("Last-Modified", lastModified);
+        }
+
+        if (pdfObject.etag) {
+          reply.header("ETag", pdfObject.etag);
+        }
+
+        return reply.send(pdfObject.stream);
+      } catch (error) {
+        app.log.error("Erro ao visualizar PDF:", {
+          error: error.message,
+          key: objectKey,
+        });
+
+        const translations = await app.i18nService.getTranslations(lang);
+
+        if (error.code === "PDF_NOT_FOUND") {
+          return reply.code(404).send({
+            error: "PDF Not Found",
+            message: app.i18nService.formatMessage(
+              translations.api?.errors?.not_found || "Recurso não encontrado"
+            ),
+            statusCode: 404,
+            language: lang,
+          });
+        }
+
+        return reply.code(500).send({
+          error: "PDF View Failed",
+          message: app.i18nService.formatMessage(
+            translations.api?.errors?.internal_error ||
+              "Erro interno do servidor"
+          ),
+          statusCode: 500,
+          language: lang,
+        });
+      }
+    },
+  });
+
   // Rota para listar templates disponíveis (com suporte a idioma)
   app.route({
     method: "GET",
