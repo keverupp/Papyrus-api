@@ -201,64 +201,59 @@ module.exports = fp(
       return metadata;
     }
 
+    function convertCloudinarySvgUrls(obj) {
+      if (!obj || typeof obj !== "object") return obj;
+      const transformUrl = (url) => {
+        if (
+          typeof url === "string" &&
+          url.includes("res.cloudinary.com") &&
+          url.endsWith(".svg")
+        ) {
+          return url
+            .replace("/upload/", "/upload/f_png,w_1024,dpr_2/")
+            .replace(/\.svg(?:\?.*)?$/, ".png");
+        }
+        return url;
+      };
+
+      for (const key of Object.keys(obj)) {
+        if (typeof obj[key] === "string") {
+          obj[key] = transformUrl(obj[key]);
+        } else if (typeof obj[key] === "object") {
+          convertCloudinarySvgUrls(obj[key]);
+        }
+      }
+      return obj;
+    }
+
     /**
      * Gera nome de exibição baseado no tipo
      */
-    function generateDisplayName(type) {
-      const names = {
-        blank: "Página em Branco",
-        logo: "Com Logotipo",
-        watermark: "Com Marca d'água",
-        exam: "Prova/Exame",
-        assessment: "Avaliação",
-        quiz: "Quiz/Questionário",
-        budget: "Orçamento",
-        "budget-premium": "Orçamento Premium",
-        report: "Relatório",
-        invoice: "Fatura/Invoice",
-        anamnesis: "Ficha de Anamnese",
-        prescription: "Receita Médica",
-        clinical_form: "Formulário Clínico",
-      };
+      function generateDisplayName(type) {
+        const names = {
+          "budget-premium": "Orçamento Premium",
+        };
 
-      return names[type] || type.charAt(0).toUpperCase() + type.slice(1);
-    }
+        return names[type] || type.charAt(0).toUpperCase() + type.slice(1);
+      }
 
     /**
      * Templates de fallback caso o scan automático falhe
      */
-    function getFallbackTemplates() {
-      return {
-        basic: [
-          {
-            type: "blank",
-            name: "Página em Branco",
-            description: "Documento básico sem formatação específica",
-            template: "basic/blank.hbs",
-            language: "pt-BR",
-          },
-        ],
-        educational: [
-          {
-            type: "exam",
-            name: "Prova/Exame",
-            description: "Template para provas e exames escolares",
-            template: "educational/exam.hbs",
-            language: "pt-BR",
-          },
-        ],
-        business: [
-          {
-            type: "budget-premium",
-            name: "Orçamento Premium",
-            description:
-              "Template de orçamento avançado com logo e marca d'água",
-            template: "business/budget-premium.js",
-            language: "pt-BR",
-          },
-        ],
-      };
-    }
+      function getFallbackTemplates() {
+        return {
+          business: [
+            {
+              type: "budget-premium",
+              name: "Orçamento Premium",
+              description:
+                "Template de orçamento avançado com logo e marca d'água",
+              template: "business/budget-premium.js",
+              language: "pt-BR",
+            },
+          ],
+        };
+      }
 
     /**
      * Força refresh do cache de templates
@@ -415,26 +410,7 @@ module.exports = fp(
      */
     function processTemplateData(templateType, data) {
       const processors = {
-        // Templates básicos
-        blank: processBasicTemplate,
-        logo: processLogoTemplate,
-        watermark: processWatermarkTemplate,
-
-        // Templates educacionais/gerais
-        exam: processExamTemplate,
-        assessment: processAssessmentTemplate,
-        quiz: processQuizTemplate,
-
-        // Templates empresariais
-        budget: processBudgetTemplate,
-        invoice: processInvoiceTemplate,
         "budget-premium": processBudgetPremiumTemplate,
-        report: processReportTemplate,
-
-        // Templates médicos
-        anamnesis: processAnamnesisTemplate,
-        prescription: processPrescriptionTemplate,
-        clinical_form: processClinicalFormTemplate,
       };
 
       const processor = processors[templateType];
@@ -475,6 +451,7 @@ module.exports = fp(
 
         // Processa os dados específicos do template
         const processedData = processTemplateData(templateType, data);
+        const finalData = convertCloudinarySvgUrls(processedData);
 
         // Renderiza o template conforme a extensão
         if (templateInfo.extension === "js") {
@@ -483,12 +460,12 @@ module.exports = fp(
             templateInfo.template
           );
           const templateFn = require(templatePath);
-          return templateFn(processedData);
+          return templateFn(finalData);
         }
 
         return await app.handlebars.renderTemplate(
           templateInfo.template,
-          processedData
+          finalData
         );
       } catch (error) {
         app.log.error("❌ Erro na renderização do template:", error);
@@ -507,128 +484,6 @@ module.exports = fp(
         date: now,
         ...data,
       };
-    }
-
-    function processLogoTemplate(data) {
-      return {
-        ...processBasicTemplate(data),
-        logo: {
-          url: data.logo?.url || "",
-          width: data.logo?.width || "auto",
-          height: data.logo?.height || "60px",
-        },
-      };
-    }
-
-    function processWatermarkTemplate(data) {
-      return {
-        ...processBasicTemplate(data),
-        watermark: {
-          text: data.watermark?.text || "CONFIDENCIAL",
-          opacity: data.watermark?.opacity || 0.1,
-          rotation: data.watermark?.rotation || -45,
-          fontSize: data.watermark?.fontSize || "60px",
-        },
-      };
-    }
-
-    function processBudgetTemplate(data) {
-      const budget = data.budget || {};
-      const items = budget.items || [];
-
-      const subtotal = items.reduce((sum, item) => {
-        return sum + item.quantity * item.unitPrice;
-      }, 0);
-
-      const discountAmount = budget.discount || 0;
-      const taxRate = budget.taxRate || 0;
-      const taxAmount = (subtotal - discountAmount) * (taxRate / 100);
-      const total = subtotal - discountAmount + taxAmount;
-
-      return {
-        title: data.title || "Orçamento",
-        date: new Date(),
-        budget: {
-          ...budget,
-          items: items.map((item) => ({
-            ...item,
-            total: item.quantity * item.unitPrice,
-          })),
-          calculations: {
-            subtotal,
-            discountAmount,
-            taxRate,
-            taxAmount,
-            total,
-          },
-        },
-        ...data,
-      };
-    }
-
-    function processExamTemplate(data) {
-      const exam = data.exam || {};
-      return {
-        title: data.title || "Exame",
-        date: new Date(),
-        exam: {
-          subject: exam.subject || "",
-          duration: exam.duration || "",
-          instructions: exam.instructions || "",
-          questions: exam.questions || [],
-          ...exam,
-        },
-        ...data,
-      };
-    }
-
-    function processAssessmentTemplate(data) {
-      const assessment = data.assessment || {};
-      return {
-        title: data.title || "Avaliação",
-        date: new Date(),
-        assessment: {
-          subject: assessment.subject || "",
-          period: assessment.period || "",
-          criteria: assessment.criteria || [],
-          sections: assessment.sections || [],
-          ...assessment,
-        },
-        ...data,
-      };
-    }
-
-    function processQuizTemplate(data) {
-      const quiz = data.quiz || {};
-      return {
-        title: data.title || "Quiz",
-        date: new Date(),
-        quiz: {
-          subject: quiz.subject || "",
-          duration: quiz.duration || "",
-          questions: quiz.questions || [],
-          totalPoints: quiz.totalPoints || 0,
-          ...quiz,
-        },
-        ...data,
-      };
-    }
-
-    function processReportTemplate(data) {
-      return {
-        title: data.title || "Relatório",
-        date: new Date(),
-        report: {
-          summary: data.report?.summary || "",
-          sections: data.report?.sections || [],
-          ...data.report,
-        },
-        ...data,
-      };
-    }
-
-    function processInvoiceTemplate(data) {
-      return processBudgetTemplate(data);
     }
 
     function processBudgetPremiumTemplate(data) {
@@ -694,36 +549,6 @@ module.exports = fp(
       }
 
       return processedData;
-    }
-
-    function processAnamnesisTemplate(data) {
-      return {
-        title: data.title || "Ficha de Anamnese",
-        date: new Date(),
-        patient: data.patient || {},
-        anamnesis: data.anamnesis || {},
-        ...data,
-      };
-    }
-
-    function processPrescriptionTemplate(data) {
-      return {
-        title: data.title || "Receita Médica",
-        date: new Date(),
-        doctor: data.doctor || {},
-        patient: data.patient || {},
-        medications: data.medications || [],
-        ...data,
-      };
-    }
-
-    function processClinicalFormTemplate(data) {
-      return {
-        title: data.title || "Formulário Clínico",
-        date: new Date(),
-        form: data.form || {},
-        ...data,
-      };
     }
 
     // Inicializa o cache na inicialização do plugin

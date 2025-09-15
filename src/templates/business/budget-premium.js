@@ -532,11 +532,29 @@ async function generateBudgetPremium(data) {
 
   // OBSERVAÇÕES E TERMOS COM BORDAS LIMPAS
   if (data.budget.notes || data.budget.terms) {
-    checkPageBreak(20);
+    const sectionWidth = (contentWidth - 6) / 2;
+    const lineHeight = 3;
+    const paddingTop = 8;
+    const paddingBottom = 4;
+
+    const notesLines = data.budget.notes
+      ? breakText(data.budget.notes, sectionWidth - 8, 6)
+      : [];
+    const termsLines = data.budget.terms
+      ? breakText(data.budget.terms, sectionWidth - 8, 6)
+      : [];
+
+    const notesHeight = data.budget.notes
+      ? paddingTop + notesLines.length * lineHeight + paddingBottom
+      : 0;
+    const termsHeight = data.budget.terms
+      ? paddingTop + termsLines.length * lineHeight + paddingBottom
+      : 0;
+    const sectionHeight = Math.max(notesHeight, termsHeight);
+
+    checkPageBreak(sectionHeight + 5);
 
     y += 3;
-    const sectionWidth = (contentWidth - 6) / 2;
-    const sectionHeight = 18;
     const sectionRadius = 3;
 
     // Observações
@@ -545,7 +563,7 @@ async function generateBudgetPremium(data) {
         margin.left,
         y,
         sectionWidth,
-        sectionHeight,
+        notesHeight,
         sectionRadius,
         colors.light,
         colors.border
@@ -559,11 +577,8 @@ async function generateBudgetPremium(data) {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(6);
       doc.setTextColor(...colors.text);
-      const notesLines = breakText(data.budget.notes, sectionWidth - 8, 6);
       notesLines.forEach((line, index) => {
-        if (y + 8 + index * 3 < y + sectionHeight - 1 && index < 3) {
-          doc.text(line, margin.left + 4, y + 8 + index * 3);
-        }
+        doc.text(line, margin.left + 4, y + paddingTop + index * lineHeight);
       });
     }
 
@@ -575,7 +590,7 @@ async function generateBudgetPremium(data) {
         termsX,
         y,
         sectionWidth,
-        sectionHeight,
+        termsHeight,
         sectionRadius,
         colors.light,
         colors.border
@@ -589,15 +604,12 @@ async function generateBudgetPremium(data) {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(6);
       doc.setTextColor(...colors.text);
-      const termsLines = breakText(data.budget.terms, sectionWidth - 8, 6);
       termsLines.forEach((line, index) => {
-        if (y + 8 + index * 3 < y + sectionHeight - 1 && index < 3) {
-          doc.text(line, termsX + 4, y + 8 + index * 3);
-        }
+        doc.text(line, termsX + 4, y + paddingTop + index * lineHeight);
       });
     }
 
-    y += 25;
+    y += sectionHeight + 5;
   }
 
   // RODAPÉ COM BORDAS LIMPAS
