@@ -237,11 +237,11 @@ async function generateBudgetPremium(data) {
   doc.setFontSize(9);
   doc.setTextColor(...colors.primary);
   const budgetTitle = data.budget.number
-    ? `Proposta Nº ${data.budget.number}`
+    ? `Proposta ${data.budget.number}`
     : data.title || "Orçamento Premium";
   doc.text(budgetTitle, pageWidth - margin.right, y + 5, { align: "right" });
 
-  doc.setFont("helvetica", "normal");
+  doc.setFont("helvetica", "bold");
   doc.setFontSize(6);
   doc.setTextColor(...colors.secondary);
   const currentDate = new Date().toLocaleDateString("pt-BR");
@@ -265,7 +265,7 @@ async function generateBudgetPremium(data) {
   }
 
   // Linha separadora fina
-  doc.setDrawColor(...colors.accent);
+  doc.setDrawColor(...colors.primary);
   doc.setLineWidth(1);
   doc.line(
     margin.left,
@@ -280,7 +280,7 @@ async function generateBudgetPremium(data) {
   if (data.budget.client) {
     checkPageBreak(18);
 
-    const clientBoxHeight = 16;
+    const clientBoxHeight = 10;
     const borderRadius = 3; // Raio ligeiramente maior para melhor aparência
 
     // Fundo com bordas arredondadas CORRIGIDAS
@@ -294,18 +294,12 @@ async function generateBudgetPremium(data) {
       colors.border
     );
 
-    // Título compacto
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(7);
-    doc.setTextColor(...colors.primary);
-    doc.text("CLIENTE", margin.left + 4, y + 5);
-
     // Dados formatados conforme solicitado
-    doc.setFont("helvetica", "normal");
+    doc.setFont("helvetica", "bold");
     doc.setFontSize(6);
     doc.setTextColor(...colors.text);
 
-    let yClient = y + 10;
+    let yClient = y + 4;
     const clientName = data.budget.client.name
       ? `Cliente: ${data.budget.client.name}`
       : "Cliente:";
@@ -459,7 +453,7 @@ async function generateBudgetPremium(data) {
 
   const totalsWidth = contentWidth * 0.35;
   const totalsX = pageWidth - margin.right - totalsWidth;
-  const totalsBoxHeight = 25;
+  const totalsBoxHeight = 21;
   const totalsRadius = 2;
 
   // Background com bordas arredondadas LIMPAS
@@ -512,7 +506,7 @@ async function generateBudgetPremium(data) {
 
   // Total final com bordas arredondadas LIMPAS
   const finalTotal = subtotal - (data.budget.discount || 0);
-  const finalTotalRadius = 3;
+  const finalTotalRadius = 2;
   drawRoundedRect(
     totalsX - 4,
     y,
@@ -629,7 +623,7 @@ async function generateBudgetPremium(data) {
   );
 
   // Linha superior
-  doc.setDrawColor(...colors.accent);
+  doc.setDrawColor(...colors.primary);
   doc.setLineWidth(0.5);
   doc.line(margin.left + 2, footerY, pageWidth - margin.right - 2, footerY);
 
