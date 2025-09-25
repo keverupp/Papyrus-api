@@ -133,7 +133,8 @@ supportedLanguages: en-US, pt-BR
           <div class="company-name">
             <h1>{{budget.company.name}}</h1>
             <div class="company-details">
-              {{#if budget.company.cnpj}}Tax ID: {{budget.company.cnpj}}{{/if}}
+              {{#if budget.company.cnpj}}Tax ID:
+                {{document budget.company.cnpj}}{{/if}}
               {{#if budget.company.address}} | {{budget.company.address}}{{/if}}
             </div>
           </div>
@@ -162,7 +163,7 @@ supportedLanguages: en-US, pt-BR
                 <span class="detail-label">{{#ifCond
                     budget.client.document.length ">" 14
                   }}Tax ID{{else}}ID{{/ifCond}}:</span>
-                <span>{{budget.client.document}}</span>
+                <span>{{document budget.client.document}}</span>
               </div>
             {{/if}}
             {{#if budget.client.email}}
@@ -174,7 +175,7 @@ supportedLanguages: en-US, pt-BR
             {{#if budget.client.phone}}
               <div class="detail-item">
                 <span class="detail-label">Phone:</span>
-                <span>{{budget.client.phone}}</span>
+                <span>{{phone budget.client.phone}}</span>
               </div>
             {{/if}}
           </div>

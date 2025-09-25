@@ -93,11 +93,11 @@ author: Papyrus Team
               {{#if budget.company.address}}<div
                 >{{budget.company.address}}</div>{{/if}}
               {{#if budget.company.phone}}<div>Tel:
-                  {{budget.company.phone}}</div>{{/if}}
+                  {{phone budget.company.phone}}</div>{{/if}}
               {{#if budget.company.email}}<div>E-mail:
                   {{budget.company.email}}</div>{{/if}}
               {{#if budget.company.cnpj}}<div>CNPJ:
-                  {{budget.company.cnpj}}</div>{{/if}}
+                  {{document budget.company.cnpj}}</div>{{/if}}
             </div>
           </div>
         {{/if}}
@@ -110,14 +110,14 @@ author: Papyrus Team
               {{#if budget.client.address}}<div
                 >{{budget.client.address}}</div>{{/if}}
               {{#if budget.client.phone}}<div>Tel:
-                  {{budget.client.phone}}</div>{{/if}}
+                  {{phone budget.client.phone}}</div>{{/if}}
               {{#if budget.client.email}}<div>E-mail:
                   {{budget.client.email}}</div>{{/if}}
               {{#if budget.client.document}}
                 <div>{{#ifCond
                     budget.client.document.length ">" 14
                   }}CNPJ{{else}}CPF{{/ifCond}}:
-                  {{budget.client.document}}</div>
+                  {{document budget.client.document}}</div>
               {{/if}}
             </div>
           </div>

@@ -49,6 +49,33 @@ module.exports = fp(
      * Registra helpers customizados para os templates
      */
     function registerHelpers() {
+      function extractDigits(value) {
+        if (value === null || value === undefined) {
+          return "";
+        }
+
+        return value.toString().replace(/\D+/g, "");
+      }
+
+      function formatWithMask(digits, mask) {
+        let result = "";
+        let digitIndex = 0;
+
+        for (const char of mask) {
+          if (char === "#") {
+            if (digitIndex >= digits.length) {
+              break;
+            }
+            result += digits[digitIndex];
+            digitIndex += 1;
+          } else {
+            result += char;
+          }
+        }
+
+        return result;
+      }
+
       // Helper para formatação de moeda
       handlebars.registerHelper("currency", function (value) {
         if (!value && value !== 0) return "R$ 0,00";
@@ -123,6 +150,77 @@ module.exports = fp(
           minimumFractionDigits: safeDecimals,
           maximumFractionDigits: safeDecimals,
         }).format(parseFloat(value) || 0);
+      });
+
+      // Helper para formatação de telefone
+      handlebars.registerHelper("phone", function (value) {
+        const digits = extractDigits(value);
+
+        if (!digits) {
+          return "";
+        }
+
+        if (digits.length > 11) {
+          const countryCode = digits.slice(0, digits.length - 11);
+          const national = digits.slice(-11);
+          const formattedNational = formatWithMask(
+            national,
+            "(##) #####-####"
+          );
+          return `+${countryCode} ${formattedNational}`.trim();
+        }
+
+        if (digits.length === 11) {
+          return formatWithMask(digits, "(##) #####-####");
+        }
+
+        if (digits.length === 10) {
+          return formatWithMask(digits, "(##) ####-####");
+        }
+
+        if (digits.length === 9) {
+          return formatWithMask(digits, "#####-####");
+        }
+
+        if (digits.length === 8) {
+          return formatWithMask(digits, "####-####");
+        }
+
+        return value || "";
+      });
+
+      // Helper para formatação de documentos (CPF/CNPJ)
+      handlebars.registerHelper("document", function (value) {
+        const digits = extractDigits(value);
+
+        if (!digits) {
+          return "";
+        }
+
+        if (digits.length === 14) {
+          return formatWithMask(digits, "##.###.###/####-##");
+        }
+
+        if (digits.length === 11) {
+          return formatWithMask(digits, "###.###.###-##");
+        }
+
+        return value || "";
+      });
+
+      // Helper para formatação de CEP
+      handlebars.registerHelper("cep", function (value) {
+        const digits = extractDigits(value);
+
+        if (!digits) {
+          return "";
+        }
+
+        if (digits.length >= 8) {
+          return formatWithMask(digits.slice(0, 8), "#####-###");
+        }
+
+        return value || "";
       });
 
       // Helper para loops com index
