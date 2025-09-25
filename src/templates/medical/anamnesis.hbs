@@ -147,7 +147,13 @@
             {{#if doctor.phone}}
               <div class="info-item">
                 <span class="info-label">Telefone:</span>
-                <span class="info-value">{{doctor.phone}}</span>
+                <span class="info-value">{{phone doctor.phone}}</span>
+              </div>
+            {{/if}}
+            {{#if doctor.cep}}
+              <div class="info-item">
+                <span class="info-label">CEP:</span>
+                <span class="info-value">{{cep doctor.cep}}</span>
               </div>
             {{/if}}
           </div>
@@ -200,7 +206,7 @@
           <div class="form-field">
             <label>CPF:</label>
             {{#if patient.document}}
-              <div class="field-value">{{patient.document}}</div>
+              <div class="field-value">{{cpfCnpj patient.document}}</div>
             {{else}}
               <div class="field-input"></div>
             {{/if}}
@@ -208,7 +214,15 @@
           <div class="form-field">
             <label>Telefone:</label>
             {{#if patient.phone}}
-              <div class="field-value">{{patient.phone}}</div>
+              <div class="field-value">{{phone patient.phone}}</div>
+            {{else}}
+              <div class="field-input"></div>
+            {{/if}}
+          </div>
+          <div class="form-field">
+            <label>CEP:</label>
+            {{#if patient.cep}}
+              <div class="field-value">{{cep patient.cep}}</div>
             {{else}}
               <div class="field-input"></div>
             {{/if}}

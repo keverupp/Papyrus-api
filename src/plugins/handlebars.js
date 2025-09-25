@@ -4,6 +4,13 @@ const fp = require("fastify-plugin");
 const handlebars = require("handlebars");
 const fs = require("fs").promises;
 const path = require("path");
+const {
+  formatCurrencyBRL,
+  formatPhoneNumber,
+  formatCnpj,
+  formatCpfCnpj,
+  formatCep,
+} = require("../utils/formatters");
 
 module.exports = fp(
   async (app) => {
@@ -51,16 +58,27 @@ module.exports = fp(
     function registerHelpers() {
       // Helper para formatação de moeda
       handlebars.registerHelper("currency", function (value) {
-        if (!value && value !== 0) return "R$ 0,00";
+        return formatCurrencyBRL(value);
+      });
 
-        const numValue = parseFloat(value) || 0;
+      // Helper para formatação de telefone
+      handlebars.registerHelper("phone", function (value) {
+        return formatPhoneNumber(value);
+      });
 
-        return new Intl.NumberFormat("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }).format(numValue);
+      // Helper para formatação de CNPJ
+      handlebars.registerHelper("cnpj", function (value) {
+        return formatCnpj(value);
+      });
+
+      // Helper para formatação de CPF/CNPJ automático
+      handlebars.registerHelper("cpfCnpj", function (value) {
+        return formatCpfCnpj(value);
+      });
+
+      // Helper para formatação de CEP
+      handlebars.registerHelper("cep", function (value) {
+        return formatCep(value);
       });
 
       // Helper para formatação de data

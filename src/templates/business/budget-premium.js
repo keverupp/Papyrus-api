@@ -1,4 +1,7 @@
 const { jsPDF } = require("jspdf");
+const { formatCurrencyBRL, formatPhoneNumber, formatCnpj, formatCep } = require(
+  "../../utils/formatters"
+);
 
 async function generateBudgetPremium(data) {
   const doc = new jsPDF({
@@ -225,9 +228,11 @@ async function generateBudgetPremium(data) {
   doc.setTextColor(...colors.secondary);
   let companyDetails = [];
   if (data.budget.company?.cnpj)
-    companyDetails.push(`CNPJ: ${data.budget.company.cnpj}`);
+    companyDetails.push(`CNPJ: ${formatCnpj(data.budget.company.cnpj)}`);
   if (data.budget.company?.address)
     companyDetails.push(data.budget.company.address);
+  if (data.budget.company?.cep)
+    companyDetails.push(`CEP: ${formatCep(data.budget.company.cep)}`);
   if (companyDetails.length > 0) {
     doc.text(companyDetails.join(" • "), xLogo, y + 9);
   }
@@ -307,7 +312,7 @@ async function generateBudgetPremium(data) {
 
     if (data.budget.client.phone) {
       doc.text(
-        `Contato: ${data.budget.client.phone}`,
+        `Contato: ${formatPhoneNumber(data.budget.client.phone)}`,
         margin.left + 4,
         yClient + 4
       );
@@ -411,8 +416,9 @@ async function generateBudgetPremium(data) {
 
       // Valor unitário
       const unitPrice = item.unitPrice || 0;
+      const formattedUnitPrice = formatCurrencyBRL(unitPrice);
       doc.text(
-        `R$ ${unitPrice.toFixed(2)}`,
+        formattedUnitPrice,
         colPositions.unitPrice + colWidths.unitPrice - 3,
         y + 5,
         { align: "right" }
@@ -422,8 +428,9 @@ async function generateBudgetPremium(data) {
       const rowTotal = qty * unitPrice;
       doc.setFont("helvetica", "bold");
       doc.setTextColor(...colors.success);
+      const formattedRowTotal = formatCurrencyBRL(rowTotal);
       doc.text(
-        `R$ ${rowTotal.toFixed(2)}`,
+        formattedRowTotal,
         colPositions.total + colWidths.total - 3,
         y + 5,
         { align: "right" }
@@ -482,7 +489,8 @@ async function generateBudgetPremium(data) {
       (sum, item) => sum + (item.quantity || 0) * (item.unitPrice || 0),
       0
     ) || 0;
-  doc.text(`R$ ${subtotal.toFixed(2)}`, pageWidth - margin.right - 2, y + 5, {
+  const formattedSubtotal = formatCurrencyBRL(subtotal);
+  doc.text(formattedSubtotal, pageWidth - margin.right - 2, y + 5, {
     align: "right",
   });
   y += 8;
@@ -495,8 +503,9 @@ async function generateBudgetPremium(data) {
 
     doc.setTextColor(...colors.danger);
     doc.setFont("helvetica", "bold");
+    const formattedDiscount = formatCurrencyBRL(data.budget.discount);
     doc.text(
-      `- R$ ${data.budget.discount.toFixed(2)}`,
+      `- ${formattedDiscount}`,
       pageWidth - margin.right - 2,
       y + 5,
       { align: "right" }
@@ -520,7 +529,8 @@ async function generateBudgetPremium(data) {
   doc.setFontSize(8);
   doc.setTextColor(255, 255, 255);
   doc.text("VALOR TOTAL:", totalsX, y + 7);
-  doc.text(`R$ ${finalTotal.toFixed(2)}`, pageWidth - margin.right - 2, y + 7, {
+  const formattedFinalTotal = formatCurrencyBRL(finalTotal);
+  doc.text(formattedFinalTotal, pageWidth - margin.right - 2, y + 7, {
     align: "right",
   });
 
@@ -634,7 +644,7 @@ async function generateBudgetPremium(data) {
 
   let footerText = [];
   if (data.budget.company?.phone)
-    footerText.push(` ${data.budget.company.phone}`);
+    footerText.push(` ${formatPhoneNumber(data.budget.company.phone)}`);
   if (data.budget.company?.email)
     footerText.push(` ${data.budget.company.email}`);
   if (data.budget.company?.website)
