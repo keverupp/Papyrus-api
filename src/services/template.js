@@ -56,13 +56,13 @@ module.exports = fp(
 
               app.log.info(`📂 Escaneando categoria: ${categoryName}`);
 
-              // Escaneia arquivos .hbs na categoria
+              // Escaneia arquivos de template na categoria
               const templateFiles = await fs.readdir(categoryPath);
 
               const categoryTemplates = (
                 await Promise.all(
                   templateFiles
-                    .filter((file) => file.endsWith(".hbs"))
+                    .filter((file) => file.endsWith(".hbs") || file.endsWith(".js"))
                     .map(async (file) => {
                       const templatePath = path.join(categoryPath, file);
                       const templateInfo = await parseTemplateMetadata(
@@ -112,9 +112,13 @@ module.exports = fp(
     async function parseTemplateMetadata(templatePath, categoryName, fileName) {
       try {
         const content = await fs.readFile(templatePath, "utf8");
+        const ext = path.extname(fileName);
 
         // Procura pelo bloco de metadados no início do arquivo
-        const metadataRegex = /<!--\s*TEMPLATE_META\s*([\s\S]*?)\s*-->/;
+        const metadataRegex =
+          ext === ".js"
+            ? /\/\*\s*TEMPLATE_META\s*([\s\S]*?)\s*\*\//
+            : /<!--\s*TEMPLATE_META\s*([\s\S]*?)\s*-->/;
         const match = content.match(metadataRegex);
 
         if (match) {
@@ -123,7 +127,7 @@ module.exports = fp(
           const metadata = parseMetadataText(metadataText);
 
           return {
-            type: metadata.type || path.basename(fileName, ".hbs"),
+            type: metadata.type || path.basename(fileName, ext),
             name: metadata.name || metadata.type || fileName,
             description:
               metadata.description || `Template ${metadata.type || fileName}`,
@@ -137,13 +141,16 @@ module.exports = fp(
               ? metadata.supportedlanguages.split(",").map((l) => l.trim())
               : ["pt-BR"], // Novo campo
             lastModified: (await fs.stat(templatePath)).mtime,
+            extension: ext.slice(1),
           };
         } else {
           // Fallback: gera metadados básicos baseado no nome do arquivo
-          const type = path.basename(fileName, ".hbs");
+          const type = path.basename(fileName, ext);
 
           // Detecta idioma pelo sufixo do arquivo (ex: budget-premium.en-US.hbs)
-          const languageMatch = fileName.match(/\.([a-z]{2}-[A-Z]{2})\.hbs$/);
+          const languageMatch = fileName.match(
+            new RegExp(`\.([a-z]{2}-[A-Z]{2})\\${ext}$`)
+          );
           const detectedLanguage = languageMatch ? languageMatch[1] : "pt-BR";
           const cleanType = type.replace(/\.[a-z]{2}-[A-Z]{2}$/, ""); // Remove sufixo de idioma
 
@@ -158,6 +165,7 @@ module.exports = fp(
             language: detectedLanguage,
             supportedLanguages: [detectedLanguage],
             lastModified: (await fs.stat(templatePath)).mtime,
+            extension: ext.slice(1),
           };
         }
       } catch (error) {
@@ -245,7 +253,7 @@ module.exports = fp(
             name: "Orçamento Premium",
             description:
               "Template de orçamento avançado com logo e marca d'água",
-            template: "business/budget-premium.hbs",
+            template: "business/budget-premium.js",
             language: "pt-BR",
           },
         ],
@@ -273,7 +281,7 @@ module.exports = fp(
         const templates = [];
 
         for (const file of files) {
-          if (file.endsWith(".hbs")) {
+          if (file.endsWith(".hbs") || file.endsWith(".js")) {
             const templatePath = path.join(templatesDir, file);
             const templateInfo = await parseTemplateMetadata(
               templatePath,
@@ -356,27 +364,34 @@ module.exports = fp(
         const allTemplates = await getAvailableTemplates();
         const flatTemplates = Object.values(allTemplates).flat();
 
-        // Procura template no idioma específico
-        const template = flatTemplates.find(
+        // Prioriza templates JS (jsPDF)
+        const templates = flatTemplates.filter(
           (t) => t.type === templateType && t.language === language
         );
 
+        const template =
+          templates.find((t) => t.extension === "js") || templates[0];
+
         if (template) {
           app.log.debug(
-            `✅ Template encontrado: ${templateType} em ${language}`
+            `✅ Template encontrado: ${templateType} em ${language} (${template.extension})`
           );
           return template;
         }
 
         // Fallback para idioma padrão se não encontrar
         if (language !== "pt-BR") {
-          const fallbackTemplate = flatTemplates.find(
+          const fallbackTemplates = flatTemplates.filter(
             (t) => t.type === templateType && t.language === "pt-BR"
           );
 
+          const fallbackTemplate =
+            fallbackTemplates.find((t) => t.extension === "js") ||
+            fallbackTemplates[0];
+
           if (fallbackTemplate) {
             app.log.warn(
-              `⚠️ Template ${templateType} não encontrado em ${language}, usando pt-BR`
+              `⚠️ Template ${templateType} não encontrado em ${language}, usando pt-BR (${fallbackTemplate.extension})`
             );
             return fallbackTemplate;
           }
@@ -461,7 +476,16 @@ module.exports = fp(
         // Processa os dados específicos do template
         const processedData = processTemplateData(templateType, data);
 
-        // Renderiza o template
+        // Renderiza o template conforme a extensão
+        if (templateInfo.extension === "js") {
+          const templatePath = path.resolve(
+            "src/templates",
+            templateInfo.template
+          );
+          const templateFn = require(templatePath);
+          return templateFn(processedData);
+        }
+
         return await app.handlebars.renderTemplate(
           templateInfo.template,
           processedData

@@ -48,18 +48,14 @@ module.exports = fp(
           ...data,
         };
 
-        // Renderiza o template HTML (já com suporte a idioma)
-        const htmlContent = await app.templateService.renderTemplate(
+        // Renderiza o template usando jsPDF
+        const doc = await app.templateService.renderTemplate(
           type,
           templateData
         );
 
-        // Gera o PDF usando o novo sistema
-        const pdfBuffer = await app.pdfService.generatePDF(
-          htmlContent,
-          type,
-          config
-        );
+        // Gera o PDF usando jsPDF
+        const pdfBuffer = await app.pdfService.generatePDF(doc);
 
         // Nome do arquivo com sanitização melhorada
         const sanitizedTitle = title
@@ -124,20 +120,28 @@ module.exports = fp(
           ...data,
         };
 
-        // Renderiza apenas o HTML
-        const htmlContent = await app.templateService.renderTemplate(
+        // Renderiza o template
+        const rendered = await app.templateService.renderTemplate(
           type,
           templateData
         );
 
-        app.log.info("👁️ Preview HTML gerado", {
+        if (typeof rendered === "string") {
+          app.log.info("👁️ Preview HTML gerado", {
+            template_type: type,
+            title,
+            language,
+            html_size: rendered.length,
+          });
+          return rendered;
+        }
+
+        app.log.info("👁️ Preview não disponível para este template", {
           template_type: type,
           title,
           language,
-          html_size: htmlContent.length,
         });
-
-        return htmlContent;
+        return "Preview indisponível";
       } catch (error) {
         app.log.error("❌ Erro na geração do preview HTML:", {
           error: error.message,

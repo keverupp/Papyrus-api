@@ -79,7 +79,7 @@ curl http://localhost:4000/health
   "version": "1.0.0",
   "services": {
     "database": "connected",
-    "pdf_engine": "ready",
+    "pdf_engine": "jsPDF",
     "templates": "loaded"
   }
 }
